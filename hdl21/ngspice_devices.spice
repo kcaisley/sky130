@@ -10,56 +10,70 @@
 * go on 1 ppm larger: the models' bins start at round sizes (0.42 um wide, 0.15 um long), and a
 * finger exactly that wide (w / nf in floating point: 4.2 um over 10) falls just below its bin,
 * where ngspice finds no model ("could not find a valid modelname").
+*
+* The sizes in microns are the local wu, lu: ngspice evaluates a subcircuit call's parameter
+* expressions with the called subcircuit's parameters in scope, so an ad={..w..} beside
+* w={w*1e6} on the sky130_fd_pr__ call reads the callee's new w (microns, then x1e6 again), not
+* this subcircuit's metres: ad, as 1e6 x too large in m2 after the scale, pd, ps 1e6 x, nrd, nrs
+* 1e-6 x. Spectre reads the caller's w; with names the callee lacks both simulators read the
+* same values (spectre_devices.scs).
 
 * ---- 1.8 V core MOS
 .subckt nfet_01v8 d g s b w=0.42e-6 l=0.15e-6 nf=1 m=1
-xm d g s b sky130_fd_pr__nfet_01v8 w={w*1.000001e6} l={l*1.000001e6} nf={nf}
-+ ad={floor((nf+1)/2)*w*1e6/nf*0.29} as={floor((nf+2)/2)*w*1e6/nf*0.29}
-+ pd={2*floor((nf+1)/2)*(w*1e6/nf+0.29)} ps={2*floor((nf+2)/2)*(w*1e6/nf+0.29)}
-+ nrd={0.29/(w*1e6)} nrs={0.29/(w*1e6)} m={m}
+.param wu={w*1e6} lu={l*1e6}
+xm d g s b sky130_fd_pr__nfet_01v8 w={wu*1.000001} l={lu*1.000001} nf={nf}
++ ad={floor((nf+1)/2)*wu/nf*0.29} as={floor((nf+2)/2)*wu/nf*0.29}
++ pd={2*floor((nf+1)/2)*(wu/nf+0.29)} ps={2*floor((nf+2)/2)*(wu/nf+0.29)}
++ nrd={0.29/wu} nrs={0.29/wu} m={m}
 .ends nfet_01v8
 
 .subckt nfet_01v8_lvt d g s b w=0.42e-6 l=0.15e-6 nf=1 m=1
-xm d g s b sky130_fd_pr__nfet_01v8_lvt w={w*1.000001e6} l={l*1.000001e6} nf={nf}
-+ ad={floor((nf+1)/2)*w*1e6/nf*0.29} as={floor((nf+2)/2)*w*1e6/nf*0.29}
-+ pd={2*floor((nf+1)/2)*(w*1e6/nf+0.29)} ps={2*floor((nf+2)/2)*(w*1e6/nf+0.29)}
-+ nrd={0.29/(w*1e6)} nrs={0.29/(w*1e6)} m={m}
+.param wu={w*1e6} lu={l*1e6}
+xm d g s b sky130_fd_pr__nfet_01v8_lvt w={wu*1.000001} l={lu*1.000001} nf={nf}
++ ad={floor((nf+1)/2)*wu/nf*0.29} as={floor((nf+2)/2)*wu/nf*0.29}
++ pd={2*floor((nf+1)/2)*(wu/nf+0.29)} ps={2*floor((nf+2)/2)*(wu/nf+0.29)}
++ nrd={0.29/wu} nrs={0.29/wu} m={m}
 .ends nfet_01v8_lvt
 
 .subckt pfet_01v8 d g s b w=0.42e-6 l=0.15e-6 nf=1 m=1
-xm d g s b sky130_fd_pr__pfet_01v8 w={w*1.000001e6} l={l*1.000001e6} nf={nf}
-+ ad={floor((nf+1)/2)*w*1e6/nf*0.29} as={floor((nf+2)/2)*w*1e6/nf*0.29}
-+ pd={2*floor((nf+1)/2)*(w*1e6/nf+0.29)} ps={2*floor((nf+2)/2)*(w*1e6/nf+0.29)}
-+ nrd={0.29/(w*1e6)} nrs={0.29/(w*1e6)} m={m}
+.param wu={w*1e6} lu={l*1e6}
+xm d g s b sky130_fd_pr__pfet_01v8 w={wu*1.000001} l={lu*1.000001} nf={nf}
++ ad={floor((nf+1)/2)*wu/nf*0.29} as={floor((nf+2)/2)*wu/nf*0.29}
++ pd={2*floor((nf+1)/2)*(wu/nf+0.29)} ps={2*floor((nf+2)/2)*(wu/nf+0.29)}
++ nrd={0.29/wu} nrs={0.29/wu} m={m}
 .ends pfet_01v8
 
 .subckt pfet_01v8_lvt d g s b w=0.42e-6 l=0.35e-6 nf=1 m=1
-xm d g s b sky130_fd_pr__pfet_01v8_lvt w={w*1.000001e6} l={l*1.000001e6} nf={nf}
-+ ad={floor((nf+1)/2)*w*1e6/nf*0.29} as={floor((nf+2)/2)*w*1e6/nf*0.29}
-+ pd={2*floor((nf+1)/2)*(w*1e6/nf+0.29)} ps={2*floor((nf+2)/2)*(w*1e6/nf+0.29)}
-+ nrd={0.29/(w*1e6)} nrs={0.29/(w*1e6)} m={m}
+.param wu={w*1e6} lu={l*1e6}
+xm d g s b sky130_fd_pr__pfet_01v8_lvt w={wu*1.000001} l={lu*1.000001} nf={nf}
++ ad={floor((nf+1)/2)*wu/nf*0.29} as={floor((nf+2)/2)*wu/nf*0.29}
++ pd={2*floor((nf+1)/2)*(wu/nf+0.29)} ps={2*floor((nf+2)/2)*(wu/nf+0.29)}
++ nrd={0.29/wu} nrs={0.29/wu} m={m}
 .ends pfet_01v8_lvt
 
 .subckt pfet_01v8_hvt d g s b w=0.42e-6 l=0.15e-6 nf=1 m=1
-xm d g s b sky130_fd_pr__pfet_01v8_hvt w={w*1.000001e6} l={l*1.000001e6} nf={nf}
-+ ad={floor((nf+1)/2)*w*1e6/nf*0.29} as={floor((nf+2)/2)*w*1e6/nf*0.29}
-+ pd={2*floor((nf+1)/2)*(w*1e6/nf+0.29)} ps={2*floor((nf+2)/2)*(w*1e6/nf+0.29)}
-+ nrd={0.29/(w*1e6)} nrs={0.29/(w*1e6)} m={m}
+.param wu={w*1e6} lu={l*1e6}
+xm d g s b sky130_fd_pr__pfet_01v8_hvt w={wu*1.000001} l={lu*1.000001} nf={nf}
++ ad={floor((nf+1)/2)*wu/nf*0.29} as={floor((nf+2)/2)*wu/nf*0.29}
++ pd={2*floor((nf+1)/2)*(wu/nf+0.29)} ps={2*floor((nf+2)/2)*(wu/nf+0.29)}
++ nrd={0.29/wu} nrs={0.29/wu} m={m}
 .ends pfet_01v8_hvt
 
 * ---- 5 V I/O MOS (g5v0d10v5)
 .subckt nfet_g5v0d10v5 d g s b w=0.42e-6 l=0.5e-6 nf=1 m=1
-xm d g s b sky130_fd_pr__nfet_g5v0d10v5 w={w*1.000001e6} l={l*1.000001e6} nf={nf}
-+ ad={floor((nf+1)/2)*w*1e6/nf*0.29} as={floor((nf+2)/2)*w*1e6/nf*0.29}
-+ pd={2*floor((nf+1)/2)*(w*1e6/nf+0.29)} ps={2*floor((nf+2)/2)*(w*1e6/nf+0.29)}
-+ nrd={0.29/(w*1e6)} nrs={0.29/(w*1e6)} m={m}
+.param wu={w*1e6} lu={l*1e6}
+xm d g s b sky130_fd_pr__nfet_g5v0d10v5 w={wu*1.000001} l={lu*1.000001} nf={nf}
++ ad={floor((nf+1)/2)*wu/nf*0.29} as={floor((nf+2)/2)*wu/nf*0.29}
++ pd={2*floor((nf+1)/2)*(wu/nf+0.29)} ps={2*floor((nf+2)/2)*(wu/nf+0.29)}
++ nrd={0.29/wu} nrs={0.29/wu} m={m}
 .ends nfet_g5v0d10v5
 
 .subckt pfet_g5v0d10v5 d g s b w=0.42e-6 l=0.5e-6 nf=1 m=1
-xm d g s b sky130_fd_pr__pfet_g5v0d10v5 w={w*1.000001e6} l={l*1.000001e6} nf={nf}
-+ ad={floor((nf+1)/2)*w*1e6/nf*0.29} as={floor((nf+2)/2)*w*1e6/nf*0.29}
-+ pd={2*floor((nf+1)/2)*(w*1e6/nf+0.29)} ps={2*floor((nf+2)/2)*(w*1e6/nf+0.29)}
-+ nrd={0.29/(w*1e6)} nrs={0.29/(w*1e6)} m={m}
+.param wu={w*1e6} lu={l*1e6}
+xm d g s b sky130_fd_pr__pfet_g5v0d10v5 w={wu*1.000001} l={lu*1.000001} nf={nf}
++ ad={floor((nf+1)/2)*wu/nf*0.29} as={floor((nf+2)/2)*wu/nf*0.29}
++ pd={2*floor((nf+1)/2)*(wu/nf+0.29)} ps={2*floor((nf+2)/2)*(wu/nf+0.29)}
++ nrd={0.29/wu} nrs={0.29/wu} m={m}
 .ends pfet_g5v0d10v5
 
 * ---- poly resistors: P+ poly with rpm (320 ohm/sq), with urpm (2 kohm/sq); the generic
@@ -85,13 +99,14 @@ xc p n sky130_fd_pr__cap_mim_m3_1 w={w*1e6} l={l*1e6} mf={m}
 xc p n sky130_fd_pr__cap_mim_m3_2 w={w*1e6} l={l*1e6} mf={m}
 .ends cap_mim_m3_2
 
-* ---- junction diodes: area (m2) and perimeter (m)
+* ---- junction diodes: area (m2) and perimeter (m), on the PDK's diode subcircuits (their
+* model cards share the name, which Spectre cannot bind: its deck renames the cards <name>__model)
 .subckt diode_pw2nd_05v5 p n area=0.25e-12 pj=2e-6 m=1
-d1 p n sky130_fd_pr__diode_pw2nd_05v5 area={area*1e12} pj={pj*1e6} m={m}
+xd p n sky130_fd_pr__diode_pw2nd_05v5 area={area*1e12} perim={pj*1e6} m={m}
 .ends diode_pw2nd_05v5
 
 .subckt diode_pd2nw_05v5 p n area=0.25e-12 pj=2e-6 m=1
-d1 p n sky130_fd_pr__diode_pd2nw_05v5 area={area*1e12} pj={pj*1e6} m={m}
+xd p n sky130_fd_pr__diode_pd2nw_05v5 area={area*1e12} perim={pj*1e6} m={m}
 .ends diode_pd2nw_05v5
 
 * ---- vertical PNPs of fixed emitter (collector the substrate)
