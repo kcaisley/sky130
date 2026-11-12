@@ -79,6 +79,8 @@ virtual_layers:
   implant_overlap: implant_both and difftap
   licon_diff: licon and diff
   licon_difftap: licon and difftap
+  licon_difftap_peri: licon_difftap not areaid_sc
+  licon_difftap_sc: licon_difftap and areaid_sc
   licon_poly: licon and poly
   licon_poly_difftap: licon_poly and difftap
 

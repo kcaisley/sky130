@@ -3,9 +3,10 @@
     uv run python pdk/sky130/klayout/lvs.py GDS TOP SOURCE SOURCE_TOP RUN_DIR
 
 The deck pairs the top cells by name: the source's top subcircuit is renamed to the layout's, and
-its devices called by the kit's names (``nfet_01v8``) by the deck's (``netlist/lvs.py``). It
+its devices as the deck reads them (``netlist/lvs.py``'s ``as_deck``: the deck's names, a device
+the kit's SPICE calls as a subcircuit as its element). It
 runs hierarchically, its top level's pins from the layout's labels, parallel and series devices
-combined; the substrate is the source's ``vss``.
+combined in the layout and the source alike; the substrate is the source's ``vss``.
 
 The deck: ``$SKY130_OPEN_PDK`` (default ~/Documents/libs/sky130-open-pdk)/sky130A/libs.tech/klayout/lvs.
 """
@@ -28,12 +29,11 @@ def lvs(gds: Path, top: str, source: Path, source_top: str, run_dir: Path) -> tu
     if not (DECK / "sky130.lvs").is_file():
         raise FileNotFoundError(f"no SKY130 LVS deck at {DECK}: set SKY130_OPEN_PDK to the ciel root")
     run_dir.mkdir(parents=True, exist_ok=True)
-    from pdk.sky130.netlist.lvs import DEVICES
+    from pdk.sky130.netlist.lvs import as_deck
 
     text = re.sub(rf"(?im)^(\.subckt|\.ends)(\s+){re.escape(source_top)}\b", rf"\1\2{top}", Path(source).read_text())
-    names = re.compile(r"(?i)(?<![\w$])(" + "|".join(sorted(DEVICES, key=len, reverse=True)) + r")(?![\w$])")
     renamed = run_dir / "source.cdl"
-    renamed.write_text(names.sub(lambda m: DEVICES[m.group(1).lower()], text))
+    renamed.write_text(as_deck(text) + "\n")
     switches = {
         "input": gds,
         "top_cell": top,
@@ -47,7 +47,7 @@ def lvs(gds: Path, top: str, source: Path, source_top: str, run_dir: Path) -> tu
         "spice_comments": "false",
         "scale": "false",
         "verbose": "false",
-        "schematic_simplify": "false",
+        "schematic_simplify": "true",  # the source's parallel devices combined, as the layout's
         "net_only": "false",
         "top_lvl_pins": "true",
         "combine": "true",

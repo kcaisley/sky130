@@ -18,13 +18,16 @@ def _cell(name: str, inputs: tuple[str, ...]) -> h.ExternalModule:
     )
 
 
-# generic logic cell (flow/circuit/devices.py) and drive band -> sky130_fd_sc_hd cell
+# generic logic cell (flow/circuit/devices.py) and drive band -> sky130_fd_sc_hd cell: the inverters
+# the row cells reach (layout/tech.py STD_CELLS: at the rows' 680 nm M2 pitch inv_1 and inv_8 have
+# no pin access, clkinv_1 and inv_6 do); no NAND2 or NOR2 has access, so those two simulate but do
+# not lay out
 _LOGIC = {
-    ("inverter", 1): _cell("sky130_fd_sc_hd__inv_1", ("A",)),
+    ("inverter", 1): _cell("sky130_fd_sc_hd__clkinv_1", ("A",)),
     ("inverter", 4): _cell("sky130_fd_sc_hd__inv_4", ("A",)),
-    ("inverter", 8): _cell("sky130_fd_sc_hd__inv_8", ("A",)),
+    ("inverter", 8): _cell("sky130_fd_sc_hd__inv_6", ("A",)),
     ("nor2", 2): _cell("sky130_fd_sc_hd__nor2_2", ("A", "B")),
-    ("nand2", 1): _cell("sky130_fd_sc_hd__nand2_2", ("A", "B")),  # nand2_1: no access for its two inputs
+    ("nand2", 1): _cell("sky130_fd_sc_hd__nand2_1", ("A", "B")),
 }
 
 

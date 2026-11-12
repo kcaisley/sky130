@@ -18,12 +18,12 @@ nm, cell frame R0 (VSS at the bottom), from `tech.py`:
 
 | | NMOS | PMOS |
 | --- | --- | --- |
-| diffusion (`OD_LIMIT`) | 295..1085 | 1635..2425 |
+| diffusion (`OD_LIMIT`) | 295..985 | 1635..2425 |
 | gate bar and its M2 track (`GATE_TRACK`) | 1360 | 1360 |
 | S/D M2 tracks (`SD_TRACKS`) | 680 | 2040 |
 
 Row height `H` = 2720, M2 track pitch `PITCH` = 680, placement grid `XPITCH` = 460, rail
-half width `RAIL` = 85, widest finger `W_MAX` = 790; MOS models nfet_01v8 / pfet_01v8.
+half width `RAIL` = 85, widest finger `W_MAX` = 690; MOS models nfet_01v8 / pfet_01v8.
 
 ## Notes
 
@@ -39,7 +39,8 @@ half width `RAIL` = 85, widest finger `W_MAX` = 790; MOS models nfet_01v8 / pfet
 - Every gate is contacted on the middle track (1360), NMOS below it and PMOS above it as in the
   library's cells, inside the nitride poly cut npc that every poly contact needs (licon.15; the
   LVS deck connects poly only through licon inside npc). The row engine has no layer of its own
-  for npc: it is the VT band's marker (`VT_MARKS`, `VT_BAND` 1175..1545), as no VT layer is drawn.
+  for npc: it is the VT band's marker (`VT_MARKS`, `VT_BAND` 1075..1545), as no VT layer is drawn;
+  where it meets a library cell's own npc (975..1345) the two overlap by 270 nm (npc.1).
 - The row cells' devices are the standard-threshold FETs: SKY130 marks low threshold with one
   layer, lvtn, for both types, which across abutting NMOS and PMOS cells would straddle the
   N-well (MR_lvtn.OVL.2). So the kit compiles every threshold request to them (hdl21/pdk_logic.py),
@@ -51,10 +52,13 @@ half width `RAIL` = 85, widest finger `W_MAX` = 790; MOS models nfet_01v8 / pfet
   (1425), keeps nsdm.1 / psdm.1 to it.
 - The boundary layer `BND` is areaid.standardc (81/4), the outline every library cell has (the
   fill and tap cells have no 236/0).
-- The standard cells' pins sit on the library's met1 grid (170 + 340 k): their accesses use those
-  tracks too (`STD_TRACKS`, `PIN_PITCH`), and a cut lands on a pin across it as well as along it
-  (`VIA_EOL_ACROSS`: li1 needs no enclosure of mcon). nand2_1 has no access for both inputs, so the
-  logic NAND2 is nand2_2.
+- The standard cells' pins sit on the library's met1 grid (170 + 340 k), between the rows' M2 tracks
+  and their half-pitch positions (`STD_TRACKS`, `PIN_PITCH` 340), which the cells' abstracts must
+  reach; a cut lands on a pin across it as well as along it (`VIA_EOL_ACROSS`: li1 needs no
+  enclosure of mcon), and the met1 bars are half a pitch wide (`M2W` 340) so a half-pitch pad
+  touches the track's bar. Of sky130_fd_sc_hd only some cells have access then: of the inverters
+  clkinv_1, inv_4 and inv_6 (`STD_CELLS`, the logic map in `hdl21/stdcells.py`), also dfxtp_1,
+  mux2_1, conb_1, or2_1; no NAND2 or NOR2 (they simulate, but do not lay out).
 - The poly resistor is the generic poly `sky130_fd_pr__res_generic_po` (48.2 ohm/sq): the PDK's
   high-ohmic P+ resistors (res_high_po, res_xhigh_po) need 0.19 x 2.0 um contact slots (licon.1b/c)
   that the resistor cell does not draw.

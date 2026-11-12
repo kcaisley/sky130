@@ -49,10 +49,30 @@ def _subckts(text: str, names: set[str]) -> list[str]:
     return out
 
 
+_NAMES = re.compile(r"(?i)(?<![\w$])(" + "|".join(sorted(DEVICES, key=len, reverse=True)) + r")(?![\w$])")
+# a device the kit's SPICE calls as a subcircuit (X): the element the deck reads it as, by its kind
+_ELEMENTS = {"fet": "M", "res": "R", "diode": "D"}
+
+
+def as_deck(text: str) -> str:
+    """A netlist's devices as the LVS deck reads them: each kit name by the deck's
+    (``sky130_fd_pr__nfet_01v8``), and each device the kit's SPICE calls as a subcircuit (``X0 ...
+    nfet_01v8``, as ngspice needs it) as the element it is (``M0``, ``R0``, ``D0``): the deck reads
+    an X line as a call of a subcircuit, which it has none of for a device."""
+    out = []
+    for line in text.splitlines():
+        fields = line.split()
+        model = next((f for f in reversed(fields) if "=" not in f), "") if fields else ""
+        if fields and fields[0][:1] in "Xx" and model.lower() in DEVICES:
+            kind = next(k for k in _ELEMENTS if k in model.lower())
+            line = _ELEMENTS[kind] + fields[0][1:] + line[len(fields[0]) :]
+        out.append(_NAMES.sub(lambda m: DEVICES[m.group(1).lower()], line))
+    return "\n".join(out)
+
+
 def library(cells: set[str], devices: set[str]) -> str:
     """The library text the source calls: the standard cells' subcircuits (sky130_fd_sc_hd, this
-    kit's copy: their wells on their rails), each device by the deck's name."""
+    kit's copy: their wells on their rails), each device as the deck reads it (``as_deck``)."""
     from paths import STD_SPICE
 
-    pattern = re.compile(r"\b(" + "|".join(sorted(DEVICES, key=len, reverse=True)) + r")\b")
-    return "\n".join(pattern.sub(lambda m: DEVICES[m.group(1)], line) for line in _subckts(STD_SPICE.read_text(), cells))
+    return as_deck("\n".join(_subckts(STD_SPICE.read_text(), cells)))

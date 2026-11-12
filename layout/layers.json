@@ -147,7 +147,7 @@
       "Direction": "H",
       "Color": [],
       "Pitch": 680,
-      "Width": 260,
+      "Width": 340,
       "MinL": 780,
       "MaxL": null,
       "EndToEnd": 280,
@@ -743,7 +743,7 @@
       "m2Pitch": 680,
       "m3Pitch": 460,
       "m1Width": 170,
-      "m2Width": 260,
+      "m2Width": 340,
       "m3Width": 260
     },
     {

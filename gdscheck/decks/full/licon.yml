@@ -27,8 +27,12 @@ rules:
       sides: opposite
   - id: licon.11
     check: min_space
-    layers: [licon_difftap, gate]
+    layers: [licon_difftap_peri, gate]
     value: 0.055
+  - id: licon.11a
+    check: min_space
+    layers: [licon_difftap_sc, gate]
+    value: 0.05
   - id: licon.13
     check: min_space
     layers: [licon_difftap, npc]

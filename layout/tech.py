@@ -13,12 +13,12 @@ row end.
 Three choices follow from SKY130's rules (layout/README.md):
 
 * met1's enclosure of mcon (30 nm all round, m1.4) and of via (55 nm, via.4a) makes a met1 bar
-  that carries a cut 260 nm wide, so the M2 tracks are 680 nm apart (four per row, PITCH): at
-  the library's 340 nm two bars would be 80 nm apart (m1.2: 140);
+  that carries a cut at least 260 nm wide, so the M2 tracks are 680 nm apart (four per row,
+  PITCH; the bars 340 wide): at the library's 340 nm two bars would be 80 nm apart (m1.2: 140);
 * a poly contact needs the nitride poly cut npc around it (licon.15, and the LVS deck connects
   poly only through licon inside npc), which the row cells draw as a band across the row at the
-  gates' track (VT_MARKS over VT_BAND; no VT layer is drawn), every gate contacted on the middle
-  track 1360, the NMOS below it and the PMOS above it, as the library's cells have them;
+  gates' track (VT_MARKS over VT_BAND 1075..1545; no VT layer is drawn), every gate contacted on
+  the middle track 1360, the NMOS below it and the PMOS above it, as the library's cells have them;
 * the row cells' devices are the standard-threshold core FETs (nfet_01v8, pfet_01v8): lvtn,
   SKY130's low-threshold layer for both types, would merge across abutting NMOS and PMOS cells
   and straddle the N-well (MR_lvtn.OVL.2).
@@ -97,15 +97,17 @@ RAIL_IMPLANTS = ("NP", "PP")  # nsdm over the VSS rail, psdm over the VDD rail, 
 PP_TAP = 190  # VSS rail implant band half height (the library's nsdm from -190)
 NP_TAP = 2530  # VDD rail implant band bottom (top 2 H - NP_TAP = 2910, the library's psdm), as its tap cell
 # device implants 125 nm past the diffusion (nsdm / psdm enclosure of diff), joined to their rail band
-DEV_IMP = {"n": (190, 1210), "p": (1510, 2530)}
-# well: N-well band bottom (NMOS cells: 355 from their N+ diffusion, difftap.9 340), PMOS body
+DEV_IMP = {"n": (190, 1110), "p": (1510, 2530)}
+# well: N-well band bottom (NMOS cells: 455 from their N+ diffusion, difftap.9 340), PMOS body
 # bottom (195 under its P+ diffusion, difftap.8 180), top (the library's 190 past the VDD rail)
 NW_N, NW_P, NW_TOP = 1440, 1440, 2910
-VT_BAND = (1175, 1545)  # no VT layer: the npc band (VT_MARKS), 100 past the gate contacts (licon.15)
+# no VT layer: the npc band (VT_MARKS), 200 below and 100 above the gate contacts (licon.15), 270
+# into the library cells' own npc (975..1345) where it meets them (npc.1)
+VT_BAND = (1075, 1545)
 VT_MARKS = {"n": ("NPC",), "p": ("NPC",)}  # npc across every row cell at the gate track
 # the standard cells' profile the pads beside them draw (rowcell.std_pad): nsdm below, psdm and the
 # well above; 1425 joins the tap cell's own nsdm (from 1395) and keeps 450 to its psdm (to 975;
-# nsdm.1 / psdm.1 380), the well 340 from the NMOS diffusion (difftap.9: LOGIC_OD ends at 1085)
+# nsdm.1 / psdm.1 380), the well 470 from the inverters' NMOS (difftap.9 340: LOGIC_OD ends at 955)
 STD_NW = 1425
 IMP_OH, NW_OH = 0, 190  # overhang of the rail implant bands and the VDD well band past a cell, as the library
 # tie cell at every row end, and its width: the library's tapvpwrvgnd_1 with its N-tap's nsdm raised
@@ -115,11 +117,9 @@ EDGE_W = 920  # row end cell: the tie cell and one site of padding towards the r
 
 # ---- the standard cells next to the rows (stdcell_access.py, netcells.py)
 STD_CELLS = (
-    "sky130_fd_sc_hd__inv_1",
+    "sky130_fd_sc_hd__clkinv_1",
     "sky130_fd_sc_hd__inv_4",
-    "sky130_fd_sc_hd__inv_8",
-    "sky130_fd_sc_hd__nor2_2",
-    "sky130_fd_sc_hd__nand2_2",
+    "sky130_fd_sc_hd__inv_6",
     "sky130_fd_sc_hd__fill_1",
     "frida__tapvpwrvgnd_1",
 )
@@ -127,9 +127,12 @@ STD_SUPPLY = ("VPWR", "VGND")  # supply pin names, VDD rail on top (the body pin
 STD_FILL, STD_FILL_W = "sky130_fd_sc_hd__fill_1", 460  # one-site filler
 STD_FILLS = (("sky130_fd_sc_hd__fill_1", 460), ("sky130_fd_sc_hd__fill_2", 920))
 STD_TEXT_LAYERS: set[int] = set()  # labels sit on the layers' label datatype: netcells drops all text
-# pin access tracks, preferred first (middle of the cell): the library's met1 grid is 340 nm, so
-# its pins need the half-pitch positions too (PIN_PITCH)
-STD_TRACKS = (1360, 1190, 1530, 1020, 1700, 850, 1870, 680, 2040, 510, 2210, 340, 2380)
+# pin access tracks, preferred first (middle of the cell): the M2 tracks and the half-pitch
+# positions between them (PIN_PITCH), where the abstracts reach ALIGN's tracks beside them; the
+# library's own met1 grid (170 + 340 k) has a pin's middle between those, so only the cells whose
+# pins reach one of them have access (STD_CELLS: of the inverters clkinv_1, inv_4, inv_6; no NAND2
+# or NOR2)
+STD_TRACKS = (1360, 1020, 1700, 680, 2040, 340, 2380)
 PIN_PITCH = 340
 STD_WIDE = None  # one mcon on any plate
 # li1 needs no enclosure of mcon (ct.4): a cut lands on a pin across it as well as along it
@@ -140,15 +143,16 @@ EDGE_CUTS, EDGE_PAD = 1, (185, 130)  # row-end supply stack: one mcon per rail, 
 # ---- device placement in the row
 GATE_TRACK = {"n": 1360, "p": 1360}  # gate bar and its M2 track: the middle, inside the npc band
 SD_TRACKS = {"n": (680,), "p": (2040,)}  # S/D M2 tracks: one below the NMOS gates, one above the PMOS gates
-# NMOS: its strips 170 from the li1 rail (li.3) with 80 nm li1 past their contacts (li.5);
-# its diffusion 90 below the npc band (npc.4) and 190 from the gate contact (licon.14); PMOS mirrored
-OD_LIMIT = {"n": (295, 1085), "p": (1635, 2425)}  # (OD start at the rail side, furthest OD edge)
+# NMOS: its strips 170 from the li1 rail (li.3) with 80 nm li1 past their contacts (li.5); its
+# diffusion 90 below the npc band (npc.4); PMOS: 90 above it, 190 from the gate contact (licon.14)
+OD_LIMIT = {"n": (295, 985), "p": (1635, 2425)}  # (OD start at the rail side, furthest OD edge)
 # the complementary row cells' diffusion bands (rowcell.inverter): the NMOS's (lowest bottom, top),
-# the PMOS's (bottom, highest top), their gates contacted between them (1360) as the library's; the
-# NMOS ends 30 below the analog cells' so a one-unit (420) finger's drain strip reaches the output's
-# mcon on the track below the gates (680: its li1 from 595, ct.4)
-LOGIC_OD = {"n": (295, 1055), "p": (1665, 2425)}
-W_MAX = 790  # widest finger
+# the PMOS's (bottom, highest top), their gates contacted between them (1330, inside the npc band;
+# their gap the analog cells' poly head and its space to the diffusion, twice)
+# as the library's; the NMOS ends 30 below the analog cells' so a one-unit (420) finger's drain
+# strip reaches the output's mcon on the track below the gates (680: its li1 from 595, ct.4)
+LOGIC_OD = {"n": (295, 955), "p": (1705, 2425)}
+W_MAX = 690  # widest finger
 EDGE = 135  # OD to the cell edge: half of difftap.3, beside a neighbour's diffusion or tap
 OD_GAP = 270  # diffusion break between a pair's devices that share no strip (difftap.3)
 GATE_GAP = 540  # gate to gate across a shared strip when the gates differ (their poly heads, poly.2)
@@ -160,7 +164,10 @@ CO_GATE = 55  # contact to gate (licon.11): the contacted pitch is L + CO + 2 CO
 CO_OD_END, CO_OD_SIDE = 40, 40  # diff enclosure of the contacts (licon.5a)
 OD_EXT = 145  # OD past the outermost strip centre: CO / 2 + 60 (licon.5c); 285 past the gate (poly.7 250)
 V1, V2 = RULES["V1"]["cut"], RULES["V2"]["cut"]  # mcon (ct.1) / via (via.1a)
-M1W, M2W, M3W = 170, 260, 260  # li1 strips and pads (li.1), met1 / met2 bars (via + 2 x 55, via.4a / m2.4)
+# li1 strips and pads (li.1); met1 bars half the M2 pitch wide, so a pin's via pad half a pitch off
+# the tracks touches the bar beside it (the half-pitch accesses, PIN_PITCH: met1 encloses a via by
+# 55 at 260 already, via.4a); met2 bars via + 2 x 55 (m2.4)
+M1W, M2W, M3W = 170, 340, 260
 M1_CO_END = 80  # li1 past a contact along a strip (li.5)
 M1_SPACE = RULES["M1"]["space"]  # li.3
 M1_MIN_W = 170  # li.1
