@@ -28,6 +28,9 @@ uvx ciel==3.2.0 enable --pdk-root ~/Documents/libs/sky130-open-pdk \
 `SKY130_OPEN_PDK` names the ciel PDK root (default `~/Documents/libs/sky130-open-pdk`, read by
 `hdl21/site.py`, `klayout/drc.py`, `klayout/lvs.py`, `openroad/views.py`); the kit reads
 `$SKY130_OPEN_PDK/sky130A/libs.ref` and `.../libs.tech`. `sky130A/SOURCES` names the release.
+After the install, `python3 -I pdk/sky130/spectre/spectre_deck.py` writes the Spectre copy of its
+model deck into `sky130A/libs.tech/spectre` (with a manifest of its sources' hashes; `--check`
+tells a stale copy, as the `site_pdk` tests do).
 
 ## Choices
 
@@ -52,7 +55,7 @@ uvx ciel==3.2.0 enable --pdk-root ~/Documents/libs/sky130-open-pdk \
 - **Simulators: Spectre**, as every FRIDA kit (`Install.include`, `include_devices`), on a Spectre
   copy of the open PDK's ngspice deck, `$SKY130_OPEN_PDK/sky130A/libs.tech/spectre/sky130.lib.spice`
   (the same sections; Spectre 24.1 does not read the ngspice deck as it is). The copy is written
-  by a converter of exact rewrites (ngspice's braces as quotes, AGAUSS draws as `statistics`
+  by `spectre/spectre_deck.py`, a converter of exact rewrites (ngspice's braces as quotes, AGAUSS draws as `statistics`
   parameters, inline `;` comments, a name both a model and a subcircuit, the junction diodes'
   temperature laws in Spectre's terms). ngspice reads the open PDK's own deck
   (`simulation_includes(corner, "ngspice")`, `-D ngbehavior=hsa` as pdk/test_spice.py runs it;
@@ -70,6 +73,7 @@ uvx ciel==3.2.0 enable --pdk-root ~/Documents/libs/sky130-open-pdk \
 | --- | --- |
 | `hdl21/` | devices (`pdk_data`, `primitives`), the compile pass and the site installation (`pdk_logic`, `site`), the logic cells (`stdcells`), the generic cell library (`cells.py`, written by `flow.circuit.cellmap`), the device names on the PDK's models (`spectre_devices.scs`, `ngspice_devices.spice`) |
 | `layout/` | the row profile and rules (`tech.py`, `README.md`), the library locations (`paths.py`), ALIGN's files written by `flow/layout/make_pdk.py` (`layers.json`, `models.sp`, `rows.json`, `user_template.sp`), `netlists/` |
+| `spectre/spectre_deck.py` | the converter writing the Spectre copy of the open PDK's deck (`libs.tech/spectre`) |
 | `netlist/lvs.py` | the LVS source rules (the deck's device names, the cells' devices as its elements) |
 | `signoff.py` | the signoff provider of `flow/layout/signoff.py` |
 | `klayout/` | layer palette and technology (`.lyp`, `.lyt`, `.lyd25`, `.map`, the open PDK's), DRC and LVS on its decks |
@@ -83,6 +87,7 @@ uvx ciel==3.2.0 enable --pdk-root ~/Documents/libs/sky130-open-pdk \
 ## Regenerating
 
 ```text
+python3 -I pdk/sky130/spectre/spectre_deck.py                                # $SKY130_OPEN_PDK/sky130A/libs.tech/spectre (--check: current?)
 uv run python pdk/sky130/openroad/views.py                                    # openroad/
 uv run python -c "from flow.layout.pdkproc import in_pdk; in_pdk('sky130', 'flow.layout.make_pdk', 'build', 'sky130')"
 uv run python -c "from flow.circuit.cellmap import write_library; write_library('sky130')"

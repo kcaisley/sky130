@@ -100,7 +100,7 @@ def lef() -> str:
             rail = f"      LAYER li1 ;\n        RECT 0.000 {y - 0.085:.3f} {width:.3f} {y + 0.085:.3f} ;\n"
             body = re.sub(
                 rf"(  PIN {pin}\n(?:(?!  END {pin}).)*?    PORT\n)",
-                lambda m: m.group(1) + rail,
+                lambda m, rail=rail: m.group(1) + rail,
                 body,
                 count=1,
                 flags=re.DOTALL,
@@ -119,7 +119,11 @@ def verilog(cells: list[str]) -> str:
 
 def _gzip(src: Path, dst: Path) -> None:
     """``src`` gzipped as ``dst``, no time stamp (a rerun writes the same bytes)."""
-    with src.open("rb") as read, dst.open("wb") as raw, gzip.GzipFile(filename="", fileobj=raw, mode="wb", mtime=0) as write:
+    with (
+        src.open("rb") as read,
+        dst.open("wb") as raw,
+        gzip.GzipFile(filename="", fileobj=raw, mode="wb", mtime=0) as write,
+    ):
         shutil.copyfileobj(read, write)
 
 

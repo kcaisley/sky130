@@ -125,3 +125,22 @@ def test_mismatch_section(simulator: str) -> None:
 def test_site_files_exist() -> None:
     missing = [path for path in site.MODEL_FILES if not path.exists()]
     assert not missing, f"Missing SKY130 site files: {missing}"
+
+
+@pytest.mark.site_pdk
+def test_spectre_deck_is_current() -> None:
+    """The Spectre copy of the deck matches the open PDK's files and the converter's version
+    (``spectre/spectre_deck.py --check``; a stale copy is rewritten by running it)."""
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    converter = Path(sky130.__file__).parent / "spectre/spectre_deck.py"
+    root = site.PDK_PATH.parent
+    run = subprocess.run(
+        [sys.executable, "-I", str(converter), "--pdk-root", str(root), "--check"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert run.returncode == 0, run.stdout + run.stderr

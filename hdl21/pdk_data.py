@@ -137,4 +137,3 @@ def logic_module(modname: str, family: str, terminals: list[str]) -> h.ExternalM
         port_list=[h.Port(name=i) for i in terminals],
         paramtype=Sky130LogicParams,
     )
-

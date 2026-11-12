@@ -40,7 +40,9 @@ def test_cells_have_their_wells_on_their_rails():
         assert "VPB" not in pins and "VNB" not in pins, name
 
 
-@pytest.mark.parametrize(("kind", "drive"), [("inverter", 1), ("inverter", 4), ("inverter", 8), ("nor2", 2), ("nand2", 1)])
+@pytest.mark.parametrize(
+    ("kind", "drive"), [("inverter", 1), ("inverter", 4), ("inverter", 8), ("nor2", 2), ("nand2", 1)]
+)
 def test_logic_cells_are_library_cells(kind, drive):
     from flow.circuit.devices import LogicCellParams
     from pdk.sky130.hdl21.stdcells import logic_cell
