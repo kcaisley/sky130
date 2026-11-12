@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# Poly (poly.1a, poly.2).
+rules:
+  - id: poly.1a
+    check: min_width
+    layers: [poly]
+    value: 0.15
+  - id: poly.2
+    check: min_space
+    layers: [poly]
+    value: 0.21
+  - id: poly.2
+    check: min_notch
+    layers: [poly]
+    value: 0.21

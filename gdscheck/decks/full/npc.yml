@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# Nitride poly cut (npc.1, npc.2, npc.4).
+rules:
+  - id: npc.1
+    check: min_width
+    layers: [npc]
+    value: 0.27
+  - id: npc.2
+    check: min_space
+    layers: [npc]
+    value: 0.27
+  - id: npc.2
+    check: min_notch
+    layers: [npc]
+    value: 0.27
+  - id: npc.4
+    check: min_space
+    layers: [npc, gate]
+    value: 0.09

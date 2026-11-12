@@ -1,0 +1,47 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# Contacts to diffusion, tap and poly (licon.*): size, space, enclosures, the npc
+# around poly contacts.
+rules:
+  - id: licon.1
+    check: exact_width
+    layers: [licon]
+    value: 0.17
+  - id: licon.2
+    check: min_space
+    layers: [licon]
+    value: 0.17
+  - id: licon.5a
+    check: min_enclosure
+    layers: [diff, licon_diff]
+    value: 0.04
+  - id: licon.8
+    check: min_enclosure
+    layers: [poly, licon_poly]
+    value: 0.05
+  - id: licon.8a
+    check: min_enclosure
+    layers: [poly, licon_poly]
+    value: 0.08
+    params:
+      sides: opposite
+  - id: licon.11
+    check: min_space
+    layers: [licon_difftap, gate]
+    value: 0.055
+  - id: licon.13
+    check: min_space
+    layers: [licon_difftap, npc]
+    value: 0.09
+  - id: licon.14
+    check: min_space
+    layers: [licon_poly, difftap]
+    value: 0.19
+  - id: licon.15
+    check: min_enclosure
+    layers: [npc, licon_poly]
+    value: 0.1
+  - id: licon.17
+    check: forbidden
+    layers: [licon_poly_difftap]
+    value: 0.0

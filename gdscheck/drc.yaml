@@ -1,0 +1,154 @@
+# SPDX-License-Identifier: Apache-2.0
+
+name: SkyWater SKY130 (sky130A)
+version: "1.0"
+
+# The block-level periphery rules of the open SKY130 PDK that frida's layouts meet (front end:
+# well, diffusion, poly, contacts, npc, implants; back end: li1, mcon, met1-met5 and their vias;
+# the grid), coded from the rule values of the PDK's own KLayout decks (libs.tech/klayout/drc:
+# sky130A_mr.drc, sky130A.lydrc). Not a replacement for them: the kit's signoff runs them after
+# this deck (klayout/drc.py). gdscheck embeds no SKY130 deck. No antenna, density or
+# recommended rules.
+suites:
+  - name: main
+    path: suites/main.yml
+    description: Every deck
+  - name: core
+    path: suites/core.yml
+    description: Geometric DRC of a block (main; no antenna or density rules here)
+  - name: precheck
+    path: suites/precheck.yml
+    description: Grid, metal, via and enclosure checks of the metal stack
+
+decks:
+  - name: geometry
+    path: decks/geometry.yml
+    description: Minimum metal and via geometry
+  - name: enclosure
+    path: decks/enclosure.yml
+    description: Via containment by adjacent metals
+  - name: offgrid
+    path: decks/offgrid.yml
+    description: Manufacturing grid of the metal stack
+  - name: full_well
+    path: decks/full/well.yml
+    description: N-well and the diffusions against it
+  - name: full_difftap
+    path: decks/full/difftap.yml
+    description: Diffusion and tap
+  - name: full_poly
+    path: decks/full/poly.yml
+    description: Poly
+  - name: full_licon
+    path: decks/full/licon.yml
+    description: Contacts to diffusion, tap and poly, and the npc around poly contacts
+  - name: full_npc
+    path: decks/full/npc.yml
+    description: Nitride poly cut
+  - name: full_implant
+    path: decks/full/implant.yml
+    description: N+ and P+ implants
+  - name: full_li
+    path: decks/full/li.yml
+    description: Local interconnect (li1)
+  - name: full_mcon
+    path: decks/full/mcon.yml
+    description: li1 to met1 contact
+  - name: full_metal
+    path: decks/full/metal.yml
+    description: Metals met1-met5
+  - name: full_via
+    path: decks/full/via.yml
+    description: Vias via-via4 and their enclosures
+  - name: full_offgrid
+    path: decks/full/offgrid.yml
+    description: Manufacturing grid
+
+virtual_layers:
+  difftap: diff or tap
+  gate: poly and diff
+  ndiff: diff and nsdm
+  pdiff: diff and psdm
+  ntap: tap and nsdm
+  ptap: tap and psdm
+  ndifftap: difftap and nsdm
+  pdifftap: difftap and psdm
+  implanted: nsdm or psdm
+  difftap_unimplanted: difftap not implanted
+  implant_both: nsdm and psdm
+  implant_overlap: implant_both and difftap
+  licon_diff: licon and diff
+  licon_difftap: licon and difftap
+  licon_poly: licon and poly
+  licon_poly_difftap: licon_poly and difftap
+
+layers:
+  - name: nwell
+    gds_layer: 64
+    gds_datatype: 20
+  - name: diff
+    gds_layer: 65
+    gds_datatype: 20
+  - name: tap
+    gds_layer: 65
+    gds_datatype: 44
+  - name: poly
+    gds_layer: 66
+    gds_datatype: 20
+  - name: licon
+    gds_layer: 66
+    gds_datatype: 44
+  - name: li1
+    gds_layer: 67
+    gds_datatype: 20
+  - name: mcon
+    gds_layer: 67
+    gds_datatype: 44
+  - name: met1
+    gds_layer: 68
+    gds_datatype: 20
+  - name: via
+    gds_layer: 68
+    gds_datatype: 44
+  - name: met2
+    gds_layer: 69
+    gds_datatype: 20
+  - name: via2
+    gds_layer: 69
+    gds_datatype: 44
+  - name: met3
+    gds_layer: 70
+    gds_datatype: 20
+  - name: via3
+    gds_layer: 70
+    gds_datatype: 44
+  - name: met4
+    gds_layer: 71
+    gds_datatype: 20
+  - name: via4
+    gds_layer: 71
+    gds_datatype: 44
+  - name: met5
+    gds_layer: 72
+    gds_datatype: 20
+  - name: nsdm
+    gds_layer: 93
+    gds_datatype: 44
+  - name: psdm
+    gds_layer: 94
+    gds_datatype: 20
+  - name: npc
+    gds_layer: 95
+    gds_datatype: 20
+  - name: poly_res
+    gds_layer: 66
+    gds_datatype: 13
+  - name: hvtp
+    gds_layer: 78
+    gds_datatype: 44
+  - name: lvtn
+    gds_layer: 125
+    gds_datatype: 44
+  - name: areaid_sc
+    gds_layer: 81
+    gds_datatype: 4

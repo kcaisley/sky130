@@ -1,0 +1,97 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# Vias via-via4: size, space and their metals' enclosures (via.*, via2-4.*, m2.4/5, m3.4,
+# m4.3, m5.3).
+rules:
+  - id: via.1a
+    check: exact_width
+    layers: [via]
+    value: 0.15
+  - id: via.2
+    check: min_space
+    layers: [via]
+    value: 0.17
+  - id: via.4a
+    check: min_enclosure
+    layers: [met1, via]
+    value: 0.055
+  - id: via.5a
+    check: min_enclosure
+    layers: [met1, via]
+    value: 0.085
+    params:
+      sides: adjacent
+      trigger: 0.085
+  - id: m2.4
+    check: min_enclosure
+    layers: [met2, via]
+    value: 0.055
+  - id: m2.5
+    check: min_enclosure
+    layers: [met2, via]
+    value: 0.085
+    params:
+      sides: adjacent
+      trigger: 0.085
+  - id: via2.1a
+    check: exact_width
+    layers: [via2]
+    value: 0.2
+  - id: via2.2
+    check: min_space
+    layers: [via2]
+    value: 0.2
+  - id: via2.4
+    check: min_enclosure
+    layers: [met2, via2]
+    value: 0.04
+  - id: via2.5
+    check: min_enclosure
+    layers: [met2, via2]
+    value: 0.085
+    params:
+      sides: adjacent
+      trigger: 0.085
+  - id: m3.4
+    check: min_enclosure
+    layers: [met3, via2]
+    value: 0.065
+  - id: via3.1
+    check: exact_width
+    layers: [via3]
+    value: 0.2
+  - id: via3.2
+    check: min_space
+    layers: [via3]
+    value: 0.2
+  - id: via3.4
+    check: min_enclosure
+    layers: [met3, via3]
+    value: 0.06
+  - id: via3.5
+    check: min_enclosure
+    layers: [met3, via3]
+    value: 0.09
+    params:
+      sides: adjacent
+      trigger: 0.09
+  - id: m4.3
+    check: min_enclosure
+    layers: [met4, via3]
+    value: 0.065
+  - id: via4.1
+    check: exact_width
+    layers: [via4]
+    value: 0.8
+  - id: via4.2
+    check: min_space
+    layers: [via4]
+    value: 0.8
+  - id: via4.4
+    check: min_enclosure
+    layers: [met4, via4]
+    value: 0.19
+  - id: m5.3
+    check: min_enclosure
+    layers: [met5, via4]
+    value: 0.31

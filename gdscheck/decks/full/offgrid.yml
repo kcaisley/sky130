@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# Manufacturing grid (x.1b).
+rules:
+  - id: x.1b
+    check: offgrid
+    layers: [nwell, diff, tap, poly, licon, li1, mcon, met1, via, met2, via2, met3, via3, met4, via4, met5, nsdm, psdm, npc, hvtp, lvtn]
+    value: 0.005

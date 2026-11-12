@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# li1 to met1 contact (ct.1, ct.2, ct.4, m1.4, m1.5).
+rules:
+  - id: ct.1
+    check: exact_width
+    layers: [mcon]
+    value: 0.17
+  - id: ct.2
+    check: min_space
+    layers: [mcon]
+    value: 0.19
+  - id: ct.4
+    check: min_enclosure
+    layers: [li1, mcon]
+    value: 0.0
+  - id: m1.4
+    check: min_enclosure
+    layers: [met1, mcon]
+    value: 0.03
+  - id: m1.5
+    check: min_enclosure
+    layers: [met1, mcon]
+    value: 0.06
+    params:
+      sides: adjacent
+      trigger: 0.06

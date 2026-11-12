@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+
+rules:
+  - id: grid
+    check: offgrid
+    layers: [li1, mcon, met1, via, met2, via2, met3, via3, met4, via4, met5]
+    value: 0.005

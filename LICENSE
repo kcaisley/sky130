@@ -1,0 +1,21 @@
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+Copyright 2026 The FRIDA authors
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use the files of this
+repository except in compliance with the License. You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License
+is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+or implied. See the License for the specific language governing permissions and limitations under
+the License.
+
+Files derived from the open SkyWater SKY130 PDK keep its license (Apache 2.0) and notices:
+openroad/sky130_tech.lef, openroad/lef/, openroad/lib/, openroad/gds/ and openroad/sp/ (from
+sky130_fd_sc_hd, Copyright 2020 The SkyWater PDK Authors), klayout/sky130.lyp, sky130.lyt,
+sky130.map and sky130.lyd25 (from open_pdks' libs.tech/klayout, Copyright 2022 Mabrains LLC and
+the open_pdks authors).

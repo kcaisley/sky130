@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# N-well and the diffusions against it (nwell.*, difftap.8-10).
+rules:
+  - id: nwell.1
+    check: min_width
+    layers: [nwell]
+    value: 0.84
+  - id: nwell.2a
+    check: min_space
+    layers: [nwell]
+    value: 1.27
+  - id: nwell.2a
+    check: min_notch
+    layers: [nwell]
+    value: 1.27
+  - id: difftap.8
+    check: min_enclosure
+    layers: [nwell, pdiff]
+    value: 0.18
+  - id: difftap.9
+    check: min_space
+    layers: [ndiff, nwell]
+    value: 0.34
+  - id: difftap.10
+    check: min_enclosure
+    layers: [nwell, ntap]
+    value: 0.18

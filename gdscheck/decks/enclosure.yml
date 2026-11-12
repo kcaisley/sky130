@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# Containment only: the exact enclosures are the full deck's (decks/full/mcon.yml, via.yml).
+rules:
+  - id: CT.lower
+    check: min_enclosure
+    layers: [li1, mcon]
+    value: 0.0
+  - id: CT.upper
+    check: min_enclosure
+    layers: [met1, mcon]
+    value: 0.0
+  - id: V1.lower
+    check: min_enclosure
+    layers: [met1, via]
+    value: 0.0
+  - id: V1.upper
+    check: min_enclosure
+    layers: [met2, via]
+    value: 0.0
+  - id: V2.lower
+    check: min_enclosure
+    layers: [met2, via2]
+    value: 0.0
+  - id: V2.upper
+    check: min_enclosure
+    layers: [met3, via2]
+    value: 0.0
+  - id: V3.lower
+    check: min_enclosure
+    layers: [met3, via3]
+    value: 0.0
+  - id: V3.upper
+    check: min_enclosure
+    layers: [met4, via3]
+    value: 0.0
+  - id: V4.lower
+    check: min_enclosure
+    layers: [met4, via4]
+    value: 0.0
+  - id: V4.upper
+    check: min_enclosure
+    layers: [met5, via4]
+    value: 0.0

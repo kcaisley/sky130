@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# Local interconnect li1 (li.1, li.3, li.5, li.6).
+rules:
+  - id: li.1
+    check: min_width
+    layers: [li1]
+    value: 0.17
+  - id: li.3
+    check: min_space
+    layers: [li1]
+    value: 0.17
+  - id: li.3
+    check: min_notch
+    layers: [li1]
+    value: 0.17
+  - id: li.5
+    check: min_enclosure
+    layers: [li1, licon]
+    value: 0.08
+    params:
+      sides: adjacent
+      trigger: 0.08
+  - id: li.6
+    check: min_area
+    layers: [li1]
+    value: 0.056099

@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# Every deck: the block-level periphery rules this deck codes.
+include:
+  - deck: full_well
+  - deck: full_difftap
+  - deck: full_poly
+  - deck: full_licon
+  - deck: full_npc
+  - deck: full_implant
+  - deck: full_li
+  - deck: full_mcon
+  - deck: full_metal
+  - deck: full_via
+  - deck: full_offgrid

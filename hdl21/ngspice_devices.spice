@@ -1,0 +1,104 @@
+* SKY130 device names of pdk.sky130 (the PDK's CDL names) on the open PDK's sky130_fd_pr__
+* models, for ngspice in HSPICE compatibility; a simulation includes this after the model
+* library (libs.tech/ngspice/sky130.lib.spice, a corner's section).
+*
+* FRIDA's netlists size devices in metres; the models take microns under the library's
+* .option scale=1.0u, so each name passes its sizes on times 1e6. A MOS's w is its total width
+* over nf fingers; its junctions are those of a 0.29 um diffusion per strip (the PDK's own
+* schematic convention: ad = int((nf+1)/2) w/nf 0.29, pd = 2 int((nf+1)/2) (w/nf + 0.29), the
+* source's with nf+2), nrd = nrs = 0.29 / w. m is ngspice's instance multiplier. A MOS's w and l
+* go on 1 ppm larger: the models' bins start at round sizes (0.42 um wide, 0.15 um long), and a
+* finger exactly that wide (w / nf in floating point: 4.2 um over 10) falls just below its bin,
+* where ngspice finds no model ("could not find a valid modelname").
+
+* ---- 1.8 V core MOS
+.subckt nfet_01v8 d g s b w=0.42e-6 l=0.15e-6 nf=1 m=1
+xm d g s b sky130_fd_pr__nfet_01v8 w={w*1.000001e6} l={l*1.000001e6} nf={nf}
++ ad={floor((nf+1)/2)*w*1e6/nf*0.29} as={floor((nf+2)/2)*w*1e6/nf*0.29}
++ pd={2*floor((nf+1)/2)*(w*1e6/nf+0.29)} ps={2*floor((nf+2)/2)*(w*1e6/nf+0.29)}
++ nrd={0.29/(w*1e6)} nrs={0.29/(w*1e6)} m={m}
+.ends nfet_01v8
+
+.subckt nfet_01v8_lvt d g s b w=0.42e-6 l=0.15e-6 nf=1 m=1
+xm d g s b sky130_fd_pr__nfet_01v8_lvt w={w*1.000001e6} l={l*1.000001e6} nf={nf}
++ ad={floor((nf+1)/2)*w*1e6/nf*0.29} as={floor((nf+2)/2)*w*1e6/nf*0.29}
++ pd={2*floor((nf+1)/2)*(w*1e6/nf+0.29)} ps={2*floor((nf+2)/2)*(w*1e6/nf+0.29)}
++ nrd={0.29/(w*1e6)} nrs={0.29/(w*1e6)} m={m}
+.ends nfet_01v8_lvt
+
+.subckt pfet_01v8 d g s b w=0.42e-6 l=0.15e-6 nf=1 m=1
+xm d g s b sky130_fd_pr__pfet_01v8 w={w*1.000001e6} l={l*1.000001e6} nf={nf}
++ ad={floor((nf+1)/2)*w*1e6/nf*0.29} as={floor((nf+2)/2)*w*1e6/nf*0.29}
++ pd={2*floor((nf+1)/2)*(w*1e6/nf+0.29)} ps={2*floor((nf+2)/2)*(w*1e6/nf+0.29)}
++ nrd={0.29/(w*1e6)} nrs={0.29/(w*1e6)} m={m}
+.ends pfet_01v8
+
+.subckt pfet_01v8_lvt d g s b w=0.42e-6 l=0.35e-6 nf=1 m=1
+xm d g s b sky130_fd_pr__pfet_01v8_lvt w={w*1.000001e6} l={l*1.000001e6} nf={nf}
++ ad={floor((nf+1)/2)*w*1e6/nf*0.29} as={floor((nf+2)/2)*w*1e6/nf*0.29}
++ pd={2*floor((nf+1)/2)*(w*1e6/nf+0.29)} ps={2*floor((nf+2)/2)*(w*1e6/nf+0.29)}
++ nrd={0.29/(w*1e6)} nrs={0.29/(w*1e6)} m={m}
+.ends pfet_01v8_lvt
+
+.subckt pfet_01v8_hvt d g s b w=0.42e-6 l=0.15e-6 nf=1 m=1
+xm d g s b sky130_fd_pr__pfet_01v8_hvt w={w*1.000001e6} l={l*1.000001e6} nf={nf}
++ ad={floor((nf+1)/2)*w*1e6/nf*0.29} as={floor((nf+2)/2)*w*1e6/nf*0.29}
++ pd={2*floor((nf+1)/2)*(w*1e6/nf+0.29)} ps={2*floor((nf+2)/2)*(w*1e6/nf+0.29)}
++ nrd={0.29/(w*1e6)} nrs={0.29/(w*1e6)} m={m}
+.ends pfet_01v8_hvt
+
+* ---- 5 V I/O MOS (g5v0d10v5)
+.subckt nfet_g5v0d10v5 d g s b w=0.42e-6 l=0.5e-6 nf=1 m=1
+xm d g s b sky130_fd_pr__nfet_g5v0d10v5 w={w*1.000001e6} l={l*1.000001e6} nf={nf}
++ ad={floor((nf+1)/2)*w*1e6/nf*0.29} as={floor((nf+2)/2)*w*1e6/nf*0.29}
++ pd={2*floor((nf+1)/2)*(w*1e6/nf+0.29)} ps={2*floor((nf+2)/2)*(w*1e6/nf+0.29)}
++ nrd={0.29/(w*1e6)} nrs={0.29/(w*1e6)} m={m}
+.ends nfet_g5v0d10v5
+
+.subckt pfet_g5v0d10v5 d g s b w=0.42e-6 l=0.5e-6 nf=1 m=1
+xm d g s b sky130_fd_pr__pfet_g5v0d10v5 w={w*1.000001e6} l={l*1.000001e6} nf={nf}
++ ad={floor((nf+1)/2)*w*1e6/nf*0.29} as={floor((nf+2)/2)*w*1e6/nf*0.29}
++ pd={2*floor((nf+1)/2)*(w*1e6/nf+0.29)} ps={2*floor((nf+2)/2)*(w*1e6/nf+0.29)}
++ nrd={0.29/(w*1e6)} nrs={0.29/(w*1e6)} m={m}
+.ends pfet_g5v0d10v5
+
+* ---- poly resistors: P+ poly with rpm (320 ohm/sq), with urpm (2 kohm/sq); the generic
+* silicided poly of the hd tie cell (conb_1)
+.subckt res_high_po p n b w=0.35e-6 l=2e-6 m=1
+xr p n b sky130_fd_pr__res_high_po w={w*1e6} l={l*1e6} m={m}
+.ends res_high_po
+
+.subckt res_xhigh_po p n b w=0.35e-6 l=2e-6 m=1
+xr p n b sky130_fd_pr__res_xhigh_po w={w*1e6} l={l*1e6} m={m}
+.ends res_xhigh_po
+
+.subckt res_generic_po p n w=0.48e-6 l=0.5e-6 m=1
+xr p n sky130_fd_pr__res_generic_po w={w*1e6} l={l*1e6} m={m}
+.ends res_generic_po
+
+* ---- MIM capacitors: capm over met3, cap2m over met4
+.subckt cap_mim_m3_1 p n w=2e-6 l=2e-6 m=1
+xc p n sky130_fd_pr__cap_mim_m3_1 w={w*1e6} l={l*1e6} mf={m}
+.ends cap_mim_m3_1
+
+.subckt cap_mim_m3_2 p n w=2e-6 l=2e-6 m=1
+xc p n sky130_fd_pr__cap_mim_m3_2 w={w*1e6} l={l*1e6} mf={m}
+.ends cap_mim_m3_2
+
+* ---- junction diodes: area (m2) and perimeter (m)
+.subckt diode_pw2nd_05v5 p n area=0.25e-12 pj=2e-6 m=1
+d1 p n sky130_fd_pr__diode_pw2nd_05v5 area={area*1e12} pj={pj*1e6} m={m}
+.ends diode_pw2nd_05v5
+
+.subckt diode_pd2nw_05v5 p n area=0.25e-12 pj=2e-6 m=1
+d1 p n sky130_fd_pr__diode_pd2nw_05v5 area={area*1e12} pj={pj*1e6} m={m}
+.ends diode_pd2nw_05v5
+
+* ---- vertical PNPs of fixed emitter (collector the substrate)
+.subckt pnp_05v5_W0p68L0p68 c b e m=1
+xq c b e sky130_fd_pr__pnp_05v5_W0p68L0p68 m={m}
+.ends pnp_05v5_W0p68L0p68
+
+.subckt pnp_05v5_W3p40L3p40 c b e m=1
+xq c b e sky130_fd_pr__pnp_05v5_W3p40L3p40 m={m}
+.ends pnp_05v5_W3p40L3p40

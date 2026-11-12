@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# N+ and P+ implants (nsdm.*, psdm.*): size, space, their diffusions' enclosure and
+# overlap over active.
+rules:
+  - id: nsdm.1
+    check: min_space
+    layers: [nsdm]
+    value: 0.38
+  - id: nsdm.1
+    check: min_notch
+    layers: [nsdm]
+    value: 0.38
+  - id: nsdm.2
+    check: min_width
+    layers: [nsdm]
+    value: 0.38
+  - id: psdm.1
+    check: min_space
+    layers: [psdm]
+    value: 0.38
+  - id: psdm.1
+    check: min_notch
+    layers: [psdm]
+    value: 0.38
+  - id: psdm.2
+    check: min_width
+    layers: [psdm]
+    value: 0.38
+  - id: nsd.5a
+    check: min_enclosure
+    layers: [nsdm, ndifftap]
+    value: 0.125
+  - id: psd.5a
+    check: min_enclosure
+    layers: [psdm, pdifftap]
+    value: 0.125
+  - id: nsdm_psdm_overlap
+    check: forbidden
+    layers: [implant_overlap]
+    value: 0.0
+  - id: difftap.implant
+    check: forbidden
+    layers: [difftap_unimplanted]
+    value: 0.0

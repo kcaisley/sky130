@@ -1,0 +1,116 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# Areas are 1e-6 um2 below the rule: gdscheck compares them in floating point.
+rules:
+  - id: LI.width
+    check: min_width
+    layers: [li1]
+    value: 0.17
+  - id: LI.space
+    check: min_space
+    layers: [li1]
+    value: 0.17
+  - id: LI.area
+    check: min_area
+    layers: [li1]
+    value: 0.056099
+  - id: M1.width
+    check: min_width
+    layers: [met1]
+    value: 0.14
+  - id: M1.space
+    check: min_space
+    layers: [met1]
+    value: 0.14
+  - id: M1.area
+    check: min_area
+    layers: [met1]
+    value: 0.082999
+  - id: M2.width
+    check: min_width
+    layers: [met2]
+    value: 0.14
+  - id: M2.space
+    check: min_space
+    layers: [met2]
+    value: 0.14
+  - id: M2.area
+    check: min_area
+    layers: [met2]
+    value: 0.067599
+  - id: M3.width
+    check: min_width
+    layers: [met3]
+    value: 0.3
+  - id: M3.space
+    check: min_space
+    layers: [met3]
+    value: 0.3
+  - id: M3.area
+    check: min_area
+    layers: [met3]
+    value: 0.239999
+  - id: M4.width
+    check: min_width
+    layers: [met4]
+    value: 0.3
+  - id: M4.space
+    check: min_space
+    layers: [met4]
+    value: 0.3
+  - id: M4.area
+    check: min_area
+    layers: [met4]
+    value: 0.239999
+  - id: M5.width
+    check: min_width
+    layers: [met5]
+    value: 1.6
+  - id: M5.space
+    check: min_space
+    layers: [met5]
+    value: 1.6
+  - id: M5.area
+    check: min_area
+    layers: [met5]
+    value: 3.999999
+  - id: CT.width
+    check: min_width
+    layers: [mcon]
+    value: 0.17
+  - id: CT.space
+    check: min_space
+    layers: [mcon]
+    value: 0.19
+  - id: V1.width
+    check: min_width
+    layers: [via]
+    value: 0.15
+  - id: V1.space
+    check: min_space
+    layers: [via]
+    value: 0.17
+  - id: V2.width
+    check: min_width
+    layers: [via2]
+    value: 0.2
+  - id: V2.space
+    check: min_space
+    layers: [via2]
+    value: 0.2
+  - id: V3.width
+    check: min_width
+    layers: [via3]
+    value: 0.2
+  - id: V3.space
+    check: min_space
+    layers: [via3]
+    value: 0.2
+  - id: V4.width
+    check: min_width
+    layers: [via4]
+    value: 0.8
+  - id: V4.space
+    check: min_space
+    layers: [via4]
+    value: 0.8

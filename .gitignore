@@ -1,0 +1,8 @@
+# Python caches
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.ruff_cache/
+
+# Local scratch outputs
+scratch/
