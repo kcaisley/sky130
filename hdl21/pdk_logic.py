@@ -126,7 +126,7 @@ class Install(PdkInstallation):
 
     # what the site's model decks do not model, per simulator: a device, or "cells", and why
     # (pdk/test_spice.py)
-    UNMODELED: ClassVar[dict[str, dict[str, str]]] = {}
+    UNMODELED: ClassVar[dict[str, dict[str, str]]] = {"spectre": {}}
 
     def simulation_includes(self, corner: h.pdk.Corner, simulator: str = "spectre", mismatch: bool = False) -> list:
         """What a simulation of this package's devices and standard cells includes, in order, for

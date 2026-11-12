@@ -30,7 +30,8 @@ uvx ciel==3.2.0 enable --pdk-root ~/Documents/libs/sky130-open-pdk \
 `$SKY130_OPEN_PDK/sky130A/libs.ref` and `.../libs.tech`. `sky130A/SOURCES` names the release.
 After the install, `python3 -I pdk/sky130/spectre/spectre_deck.py` writes the Spectre copy of its
 model deck into `sky130A/libs.tech/spectre` (with a manifest of its sources' hashes; `--check`
-tells a stale copy, as the `site_pdk` tests do).
+tells a stale copy, as the `site_pdk` tests do; `tests/test_spectre.py` also checks that Spectre and
+ngspice agree on an operating point of the kit's devices, to 1e-4).
 
 ## Choices
 

@@ -74,11 +74,11 @@ VERSION = 1
 ENTRY = Path("libs.tech/ngspice/sky130.lib.spice")
 DEFAULT_ROOT = os.environ.get("SKY130_OPEN_PDK", str(Path.home() / "Documents/libs/sky130-open-pdk"))
 
-_INCLUDE = re.compile(r'^(\s*\.inc(?:lude)?\s+)(["\']?)([^"\'\s]+)\2\s*$', re.I)
-_AGAUSS = re.compile(r"agauss\s*\(\s*([^,()]+?)\s*,\s*([^,()]+?)\s*,\s*([^,()]+?)\s*\)", re.I)
+_INCLUDE = re.compile(r'^(\s*\.inc(?:lude)?\s+)(["\']?)([^"\'\s]+)\2\s*$', re.IGNORECASE)
+_AGAUSS = re.compile(r"agauss\s*\(\s*([^,()]+?)\s*,\s*([^,()]+?)\s*,\s*([^,()]+?)\s*\)", re.IGNORECASE)
 _MISMATCH_NAME = re.compile(r"^\*\s*\(mismatch parameter\s+([A-Za-z_]\w*)\s*\)")
-_NUMBER = re.compile(r"^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?(meg|mil|[afpnumkgt])?$", re.I)
-_DECLARE = re.compile(r"^\s*\.param\s+([A-Za-z_]\w*)\s*=", re.I)
+_NUMBER = re.compile(r"^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?(meg|mil|[afpnumkgt])?$", re.IGNORECASE)
+_DECLARE = re.compile(r"^\s*\.param\s+([A-Za-z_]\w*)\s*=", re.IGNORECASE)
 
 
 class DeckError(RuntimeError):
@@ -278,10 +278,10 @@ class Converter:
                 m = _INCLUDE.match(line)
                 if m:
                     todo.append((path.parent / m.group(3)).resolve())
-                m = re.match(r"\s*\.model\s+(\S+)", line, re.I)
+                m = re.match(r"\s*\.model\s+(\S+)", line, re.IGNORECASE)
                 if m:
                     models.add(re.sub(r"\.\d+$", "", m.group(1).lower()))
-                m = re.match(r"\s*\.subckt\s+(\S+)", line, re.I)
+                m = re.match(r"\s*\.subckt\s+(\S+)", line, re.IGNORECASE)
                 if m:
                     subckts.add(m.group(1).lower())
         self.collided = models & subckts
@@ -388,11 +388,10 @@ class Converter:
                 mean, avar, nsig = found[0]
                 if not (_is_plain(mean) and _is_plain(avar) and _is_plain(nsig)):
                     raise DeckError(f"{rel}: non-numeric AGAUSS arguments: {p}")
-                if not re.search(r"(mc_mm_switch|mc_pr_switch)\s*\*\s*agauss", p, re.I):
+                if not re.search(r"(mc_mm_switch|mc_pr_switch)\s*\*\s*agauss", p, re.IGNORECASE):
                     raise DeckError(f"{rel}: AGAUSS without its MC switch: {p}")
-                target_param = _tokens(p.replace("'", " ' "))[0] if "=" in p else "?"
-                pm = re.match(r"\s*(?:\.param\s+)?([A-Za-z_]\w*)\s*=", p, re.I)
-                target_param = pm.group(1).lower() if pm else target_param
+                pm = re.match(r"\s*(?:\.param\s+)?([A-Za-z_]\w*)\s*=", p, re.IGNORECASE)
+                target_param = pm.group(1).lower() if pm else "value"  # the parameter the draw is in
                 # the comment's name where this file declares it (the MOS cards' <name>_spectre,
                 # 0), else one of this file's own: the cap_vpp files copy one comment name
                 name = comment.group(1) if comment and comment.group(1).lower() in source_declared else None
@@ -481,8 +480,7 @@ class Converter:
         changed = False
         if "ns" not in where and jsw not in (None, "0", "0.0"):
             T, Tn = "(temper+273.15)", f"(({tn})+273.15)"
-            factor = (f"exp(({T}/{Tn}-1)*({eg})/(8.617087e-5*{T})*(1-1/({n}))"
-                      f"+({xti})*log({T}/{Tn})*(1-1/({n})))")
+            factor = f"exp(({T}/{Tn}-1)*({eg})/(8.617087e-5*{T})*(1-1/({n}))+({xti})*log({T}/{Tn})*(1-1/({n})))"
             put("jsw" if "jsw" in where else "isw", f"({jsw})*{factor}")
             toks[-1] += ["ns", "=", f"'{n}'" if not _is_plain(n) else n]
             count["diode_ns"] = count.get("diode_ns", 0) + 1
@@ -563,7 +561,9 @@ class Converter:
         eq = [i for i, t in enumerate(flat) if t == "="]
         if not eq:
             return pieces
-        positional_after = [i for i in range(eq[0] - 1, len(flat)) if flat[i] != "=" and i - 1 not in eq and i + 1 not in eq]
+        positional_after = [
+            i for i in range(eq[0] - 1, len(flat)) if flat[i] != "=" and i - 1 not in eq and i + 1 not in eq
+        ]
         if not positional_after:
             return pieces
         pos = flat[: eq[0] - 1] + [flat[i] for i in positional_after]
@@ -580,7 +580,10 @@ def write_manifest(conv: Converter, out: Path) -> None:
         "entry": str(ENTRY),
         "rewrites": dict(sorted(conv.totals.items())),
         "models_renamed": sorted(conv.collided),
-        "draws": {"mismatch": sum(d.kind == "mismatch" for d in conv.draws), "process": sum(d.kind == "process" for d in conv.draws)},
+        "draws": {
+            "mismatch": sum(d.kind == "mismatch" for d in conv.draws),
+            "process": sum(d.kind == "process" for d in conv.draws),
+        },
         "files": dict(sorted(conv.sources.items())),
     }
     (out / "manifest.json").write_text(json.dumps(manifest, indent=1) + "\n")
@@ -623,8 +626,10 @@ def main(argv: list[str] | None = None) -> int:
     conv.scan(src_root / ENTRY)
     conv.convert(src_root / ENTRY)
     write_manifest(conv, out)
-    print(f"{len(conv.done)} files -> {out}; rewrites {dict(sorted(conv.totals.items()))}; "
-          f"draws {sum(d.kind == 'mismatch' for d in conv.draws)} mismatch, {sum(d.kind == 'process' for d in conv.draws)} process")
+    print(
+        f"{len(conv.done)} files -> {out}; rewrites {dict(sorted(conv.totals.items()))}; "
+        f"draws {sum(d.kind == 'mismatch' for d in conv.draws)} mismatch, {sum(d.kind == 'process' for d in conv.draws)} process"
+    )
     return 0
 
 
