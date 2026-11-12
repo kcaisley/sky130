@@ -42,7 +42,8 @@ half width `RAIL` = 85, widest finger `W_MAX` = 790; MOS models nfet_01v8 / pfet
   for npc: it is the VT band's marker (`VT_MARKS`, `VT_BAND` 1175..1545), as no VT layer is drawn.
 - The row cells' devices are the standard-threshold FETs: SKY130 marks low threshold with one
   layer, lvtn, for both types, which across abutting NMOS and PMOS cells would straddle the
-  N-well (MR_lvtn.OVL.2).
+  N-well (MR_lvtn.OVL.2). So the kit compiles every threshold request to them (hdl21/pdk_logic.py),
+  and a netlist's MOS are what the layout draws; the `_lvt` and `_hvt` devices only by name.
 - The library has no taps in its cells: `RAIL_OD` and `RAIL_TAPS` are off, nsdm covers the VSS
   rail and psdm the VDD rail, and the row ends get the tie cell `frida__tapvpwrvgnd_1`
   (`EDGE_TIE`): the library's tapvpwrvgnd_1 with its N-tap and the nsdm around it 410 nm higher

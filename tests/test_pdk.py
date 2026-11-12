@@ -9,7 +9,8 @@ from pdk import sky130
 from pdk.sky130.hdl21 import site
 from pdk.sky130.hdl21.primitives.prim_dicts import default_xtor_size, xtors
 
-_MOS_VARIANTS = tuple((*key[1:], module.name) for key, module in xtors.items())
+_MOS_VARIANTS = tuple((*key[1:], module.name) for key, module in xtors.items() if key[2] == h.MosVth.STD)
+_BY_NAME = tuple(module.name for module in xtors.values())
 
 
 def test_supply_metadata() -> None:
@@ -46,14 +47,27 @@ def test_compile_and_netlist_mos_variant(
         assert model_name in output.getvalue()
 
 
-def test_no_high_threshold_nmos() -> None:
+@pytest.mark.parametrize("vth", [h.MosVth.LOW, h.MosVth.HIGH])
+@pytest.mark.parametrize("mos_type", [h.MosType.NMOS, h.MosType.PMOS])
+def test_any_threshold_is_the_row_cells_device(mos_type: h.MosType, vth: h.MosVth) -> None:
     @h.module
     class Dut:
         d, g, s, b = h.Signals(4)
-        m = h.Mos(tp=h.MosType.NMOS, vth=h.MosVth.HIGH)(d=d, g=g, s=s, b=b)
+        m = h.Mos(tp=mos_type, vth=vth)(d=d, g=g, s=s, b=b)
 
-    with pytest.raises(RuntimeError, match="No SKY130 MOS"):
-        sky130.compile(Dut)
+    sky130.compile(Dut)
+    assert Dut.m.of.module.name == ("nfet_01v8" if mos_type == h.MosType.NMOS else "pfet_01v8")
+
+
+@pytest.mark.parametrize("model_name", _BY_NAME)
+def test_every_device_by_its_model_name(model_name: str) -> None:
+    @h.module
+    class Dut:
+        d, g, s, b = h.Signals(4)
+        m = h.Mos(model=model_name)(d=d, g=g, s=s, b=b)
+
+    sky130.compile(Dut)
+    assert Dut.m.of.module.name == model_name
 
 
 def test_device_names_are_defined_for_ngspice() -> None:

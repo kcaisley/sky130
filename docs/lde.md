@@ -31,9 +31,10 @@ symmetry (common centroid, dummies) rather than on the model.
 
 ## Flags
 
-- `pfet_01v8_lvt`'s minimum length is 0.35 um (its smallest bin), not the core 0.15 um: its unit
-  device (`default_xtor_size`) is 0.35 um long, so per-unit tables (`devices/moscap.json`'s
-  `ff_per_um2`, computed on the core 0.15 um) overstate its gate's area density by 0.35 / 0.15.
+- Every threshold request (`MosVth.LOW`, `HIGH`) compiles to the standard-threshold FET, the one
+  the row cells draw (layout/README.md), so the device tables' LOW rows repeat the STD ones. The
+  `_lvt` and `_hvt` devices are there by model name; `pfet_01v8_lvt`'s minimum length is 0.35 um
+  (its smallest bin), not 0.15 um (`default_xtor_size`).
 - The models need ngspice's HSPICE compatibility (`ngbehavior=hsa`): without it, `pfet_01v8_lvt`'s
   cards fail BSIM4's parameter check ("u0 at current temperature ... is not positive").
 

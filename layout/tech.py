@@ -144,8 +144,10 @@ SD_TRACKS = {"n": (680,), "p": (2040,)}  # S/D M2 tracks: one below the NMOS gat
 # its diffusion 90 below the npc band (npc.4) and 190 from the gate contact (licon.14); PMOS mirrored
 OD_LIMIT = {"n": (295, 1085), "p": (1635, 2425)}  # (OD start at the rail side, furthest OD edge)
 # the complementary row cells' diffusion bands (rowcell.inverter): the NMOS's (lowest bottom, top),
-# the PMOS's (bottom, highest top), the analog cells' (their gates contacted between them, as the library's)
-LOGIC_OD = {"n": (295, 1085), "p": (1635, 2425)}
+# the PMOS's (bottom, highest top), their gates contacted between them (1360) as the library's; the
+# NMOS ends 30 below the analog cells' so a one-unit (420) finger's drain strip reaches the output's
+# mcon on the track below the gates (680: its li1 from 595, ct.4)
+LOGIC_OD = {"n": (295, 1055), "p": (1665, 2425)}
 W_MAX = 790  # widest finger
 EDGE = 135  # OD to the cell edge: half of difftap.3, beside a neighbour's diffusion or tap
 OD_GAP = 270  # diffusion break between a pair's devices that share no strip (difftap.3)
@@ -184,17 +186,18 @@ ALIGN_ROUTER = "hanan"  # ALIGN's router (frida's build falls back to ALIGN's de
 MOM_LAYERS = (2, 3, 4)
 
 # the generic poly resistor (flow/layout/rows/rescell.py): its LVS device (poly under poly.res,
-# sky130_fd_pr__res_generic_po, 48.2 ohm/sq) and model; the body under poly.res, npc over the
-# whole resistor 100 past its head contacts (licon.15), nsdm over it; the contacts 200 from the
-# body (poly.res end) and 80 inside the poly (licon.8a). The PDK's high-ohmic P+ resistors
-# (res_high_po, res_xhigh_po) need contact slots of 0.19 x 2.0 um (licon.1b/c) the row cells
-# do not draw.
+# sky130_fd_pr__res_generic_po, 48.2 ohm/sq, no implant asked for) and model; the body under poly.res,
+# npc over the whole resistor ("implant": 100 past the poly, 180 past its head contacts, licon.15),
+# the body low in the row (well_space: 635 below the N-well band, its pins on the 680 track) so
+# that npc keeps 270 from the npc band of the cells beside it (npc.2); the contacts 200 from the
+# body and 80 inside the poly (licon.8a). The PDK's high-ohmic P+ resistors (res_high_po,
+# res_xhigh_po) need contact slots of 0.19 x 2.0 um (licon.1b/c) the row cells do not draw.
 RES = {
     "model": "sky130_fd_pr__res_generic_po",
     "width": 350,
-    "markers": {"POLYRES": (0, 0), "NPC": (550, 100)},
-    "implant": ("NP", 125),
-    "well_space": 100,
+    "markers": {"POLYRES": (0, 0)},
+    "implant": ("NPC", 100),
+    "well_space": 635,
     "co_space": 200,
     "co_enc": 80,
     "cdl": "R{name} {plus} {minus} sky130_fd_pr__res_generic_po w={w}u l={l}u",

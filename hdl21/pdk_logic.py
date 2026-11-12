@@ -176,8 +176,11 @@ class Sky130Walker(h.HierarchyWalker):
         return call
 
     def mos_module(self, params: MosParams) -> h.ExternalModule:
-        """The MOS by model name, else by type, threshold and family (the I/O family has one
-        device per type). SKY130 has no high-threshold core NMOS: such a request is an error."""
+        """The MOS by model name, else by type and family at the standard threshold: the row cells
+        draw one flavour per type, the standard-threshold FET (layout/tech.py MODELS: lvtn, SKY130's
+        one low-threshold layer for both types, would straddle the N-well where NMOS and PMOS cells
+        abut), so a low- or high-threshold request takes it too, as the layout does. The
+        ``_lvt`` and ``_hvt`` devices are there by model name (``MosParams.model``)."""
         if params.model is not None:
             found = [v for k, v in xtors.items() if params.model in (k[0], v.name)]
             if not found:
@@ -187,10 +190,9 @@ class Sky130Walker(h.HierarchyWalker):
         mosfam = params.family or MosFamily.CORE
         if mosfam == MosFamily.NONE:
             mosfam = MosFamily.CORE
-        mosvth = MosVth.STD if mosfam == MosFamily.IO else (params.vth or MosVth.STD)
-        found = [v for (_, tp, vth, fam), v in xtors.items() if (tp, vth, fam) == (mostype, mosvth, mosfam)]
+        found = [v for (_, tp, vth, fam), v in xtors.items() if (tp, vth, fam) == (mostype, MosVth.STD, mosfam)]
         if not found:
-            raise RuntimeError(f"No SKY130 MOS module for type={mostype}, vth={mosvth}, family={mosfam}")
+            raise RuntimeError(f"No SKY130 MOS module for type={mostype}, family={mosfam}")
         return found[0]
 
     def mos_params(self, params: MosParams, modname: str):

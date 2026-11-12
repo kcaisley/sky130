@@ -6,8 +6,9 @@ root, README.md); rerun after a PDK update and commit the result:
 * ``sky130_tech.lef``: the library's nominal technology LEF (``sky130_fd_sc_hd__nom.tlef``);
 * ``lef/sky130_fd_sc_hd.lef``: the cells' LEF, each supply pin's li1 rail (the cells' own, under
   the met1 rail and joined to it by mcon) listed first in its port, so the row cells, whose rails
-  are li1, see the supplies on the layer of the signal pins;
-* ``lib/``: the typical (tt 25 C 1.80 V) and slow (ss 100 C 1.60 V) Liberty, gzipped;
+  are li1, see the supplies on the layer of the signal pins; the body pins VPB, VNB left out;
+* ``lib/``: the typical (tt 25 C 1.80 V) and slow (ss 100 C 1.60 V) Liberty, gzipped, the body
+  pg_pins VPB, VNB (and the supplies' related_bias_pin) left out;
 * ``gds/sky130_fd_sc_hd.gds.gz``: the cells' GDS, and the row ends' tie cell ``TIE`` (layout/tech.py
   EDGE_TIE): the library's tapvpwrvgnd_1 with its N-tap and the nsdm around it 410 nm higher (the
   tap from 1.93 um, the lower of its two contacts left out), so frida's pad beside it, whose nsdm
@@ -89,6 +90,14 @@ def spice() -> str:
     return "\n".join(out) + "\n"
 
 
+def liberty(corner: str) -> str:
+    """A corner's Liberty without the body pg_pins (VPB, VNB) and the references to them: the
+    cells as the kit's SPICE has them, wells on rails."""
+    text = (LIB / f"lib/{NAME}__{corner}.lib").read_text()
+    text = re.sub(r'^[ \t]*pg_pin \("V[NP]B"\) \{[^}]*\}\n', "", text, flags=re.MULTILINE)
+    return re.sub(r'^[ \t]*related_bias_pin : "[^"]*";\n', "", text, flags=re.MULTILINE)
+
+
 def lef() -> str:
     """The cells' LEF, each supply pin's li1 rail (from the cell's height) first in its port."""
     text = (LIB / f"lef/{NAME}.lef").read_text()
@@ -107,7 +116,8 @@ def lef() -> str:
             )
         return body
 
-    return re.sub(r"^MACRO (\S+)\n.*?^END \1$", macro, text, flags=re.DOTALL | re.MULTILINE)
+    text = re.sub(r"^MACRO (\S+)\n.*?^END \1$", macro, text, flags=re.DOTALL | re.MULTILINE)
+    return re.sub(r"^  PIN (V[NP]B)\n.*?^  END \1\n", "", text, flags=re.DOTALL | re.MULTILINE)
 
 
 def verilog(cells: list[str]) -> str:
@@ -155,11 +165,13 @@ def main() -> None:
     shutil.copyfile(LIB / f"techlef/{NAME}__nom.tlef", HERE / "sky130_tech.lef")
     (HERE / f"lef/{NAME}.lef").write_text(lef())
     for corner in CORNERS:
-        _gzip(LIB / f"lib/{NAME}__{corner}.lib", HERE / f"lib/{NAME}__{corner}.lib.gz")
+        plain = HERE / f"lib/{NAME}__{corner}.lib"
+        plain.write_text(liberty(corner))
+        _gzip(plain, HERE / f"lib/{NAME}__{corner}.lib.gz")
+        plain.unlink()
     gds(HERE / f"gds/{NAME}.gds.gz")
     (HERE / f"sp/{NAME}.sp").write_text(spice())
-    liberty = (LIB / f"lib/{NAME}__{CORNERS[0]}.lib").read_text()
-    cells = re.findall(r"^\s*cell\s*\(\s*\"?([\w$]+)\"?\s*\)", liberty, re.MULTILINE)
+    cells = re.findall(r"^\s*cell\s*\(\s*\"?([\w$]+)\"?\s*\)", liberty(CORNERS[0]), re.MULTILINE)
     (HERE / f"v/{NAME}.v").write_text(verilog(cells))
 
 
