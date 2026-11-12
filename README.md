@@ -46,12 +46,17 @@ uvx ciel==3.2.0 enable --pdk-root ~/Documents/libs/sky130-open-pdk \
   res_xhigh_po) need contact slots the row cells do not draw. **MOM capacitors** on met1 to met3
   over an li1 shield (the PDK's own vpp capacitors' stack).
 - **Sizes in metres**, as in every FRIDA kit: the open models take microns under their
-  `.option scale=1.0u`; the kit's device names (`hdl21/ngspice_devices.spice`: the PDK's CDL names,
-  `nfet_01v8` ...) pass w and l on in microns, and the junctions of a 0.29 um diffusion per strip.
-- **Simulators**: ngspice reads the open PDK's decks (`-D ngbehavior=hsa`, as pdk/test_spice.py
-  runs it; without it the low-threshold PMOS cards fail BSIM4's parameter check). Spectre does not
-  read them as they are; `Install.simulation_includes(corner, "spectre")` is where a Spectre copy
-  of the decks plugs in.
+  `.option scale=1.0u`; the kit's device names (`hdl21/spectre_devices.scs`,
+  `hdl21/ngspice_devices.spice`: the PDK's CDL names, `nfet_01v8` ...) pass w and l on in microns,
+  and the junctions of a 0.29 um diffusion per strip.
+- **Simulators: Spectre**, as every FRIDA kit (`Install.include`, `include_devices`), on a Spectre
+  copy of the open PDK's ngspice deck, `$SKY130_OPEN_PDK/sky130A/libs.tech/spectre/sky130.lib.spice`
+  (the same sections; Spectre 24.1 does not read the ngspice deck as it is). The copy is written
+  by a converter of exact rewrites (ngspice's braces as quotes, AGAUSS draws as `statistics`
+  parameters, inline `;` comments, a name both a model and a subcircuit, the junction diodes'
+  temperature laws in Spectre's terms). ngspice reads the open PDK's own deck
+  (`simulation_includes(corner, "ngspice")`, `-D ngbehavior=hsa` as pdk/test_spice.py runs it;
+  without it the low-threshold PMOS cards fail BSIM4's parameter check).
 - **Signoff: open tools.** DRC (`signoff.run_drc`): the kit's gdscheck deck (`gdscheck/drc.yaml`:
   a full deck of the periphery rules the layouts meet, suites `core`/`main`, and a metal-stack
   `precheck`; gdscheck embeds no SKY130 deck), then the open PDK's KLayout decks without density
@@ -63,7 +68,7 @@ uvx ciel==3.2.0 enable --pdk-root ~/Documents/libs/sky130-open-pdk \
 
 | Path | Contents |
 | --- | --- |
-| `hdl21/` | devices (`pdk_data`, `primitives`), the compile pass and the site installation (`pdk_logic`, `site`), the logic cells (`stdcells`), the generic cell library (`cells.py`, written by `flow.circuit.cellmap`), the device names on the PDK's models (`ngspice_devices.spice`) |
+| `hdl21/` | devices (`pdk_data`, `primitives`), the compile pass and the site installation (`pdk_logic`, `site`), the logic cells (`stdcells`), the generic cell library (`cells.py`, written by `flow.circuit.cellmap`), the device names on the PDK's models (`spectre_devices.scs`, `ngspice_devices.spice`) |
 | `layout/` | the row profile and rules (`tech.py`, `README.md`), the library locations (`paths.py`), ALIGN's files written by `flow/layout/make_pdk.py` (`layers.json`, `models.sp`, `rows.json`, `user_template.sp`), `netlists/` |
 | `netlist/lvs.py` | the LVS source rules (the deck's device names, the cells' devices as its elements) |
 | `signoff.py` | the signoff provider of `flow/layout/signoff.py` |
@@ -84,7 +89,8 @@ uv run python -c "from flow.circuit.cellmap import write_library; write_library(
 ```
 
 The device tables come from FRIDA's characterizers (`python -m flow.layout.devices.<kind>.characterize
-sky130`); their runs were made in ngspice (each table's `provenance.method`), and the MOM table's
+sky130`); their runs were made in Spectre (each table's `provenance.method`; ngspice's tables agree
+to 3e-4, but for sub-nA subthreshold currents), and the MOM table's
 ring units at 1.5, 2.5 and 3.5 um (its `lengths_nm`), where FasterCap converges on the one-metal
 ring (at 4 and 6 um it diverges).
 
@@ -98,4 +104,5 @@ ring (at 4 and 6 um it diverges).
 - Of sky130_fd_sc_hd, only cells whose pins reach those tracks or the half-pitch between them have
   access: of the inverters clkinv_1, inv_4, inv_6 (the logic map), also dfxtp_1, mux2_1, conb_1,
   or2_1; no NAND2 or NOR2, and not inv_1 (`cells.py`'s generic inverter).
-- ngspice loads all 437 cells with the devices in 31 minutes (pdk/test_spice.py allows 20).
+- ngspice loads all 437 cells with the devices in 31 minutes (pdk/test_spice.py allows 20);
+  Spectre in 10 s.

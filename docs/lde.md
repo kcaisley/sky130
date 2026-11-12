@@ -11,11 +11,11 @@
   kit's device names pass none, so frida's simulations have no LOD (the hd cells' CDL gives
   `sa = sb = 0.265`, `sd = 0.28`). WPE (`web`, `wec`) is absent from the cards.
 - **Junction areas and perimeters** default to 0 in the subcircuits (no junction capacitance).
-  The kit's device names (`hdl21/ngspice_devices.spice`) pass the PDK's schematic convention: a
+  The kit's device names (`hdl21/spectre_devices.scs`, `ngspice_devices.spice`) pass the PDK's schematic convention: a
   0.29 um diffusion per S/D strip, `ad = int((nf+1)/2) w/nf 0.29`, `pd = 2 int((nf+1)/2) (w/nf +
   0.29)`, the source's with `nf+2`, `nrd = nrs = 0.29 / w`.
 - **Mismatch** is in the cards, scaled by `MC_MM_SWITCH` (0 in the corner sections, 1 in the
-  `_mm` ones): `toxe`, `vth0`, `voff` (and the slopes) per `1 / sqrt(l w mult)` in microns; the
+  `_mm` ones, in both decks): `toxe`, `vth0`, `voff` (and the slopes) per `1 / sqrt(l w mult)` in microns; the
   kit's mismatch includes (`simulation_includes(mismatch=True)`) take the `_mm` section.
 - Gate resistance (`rgatemod = 0`), body resistance network (`rbodymod = 1`, its resistances from
   the card) and NQS (`trnqsmod = acnqsmod = 0`) are fixed in the cards.
@@ -35,11 +35,17 @@ symmetry (common centroid, dummies) rather than on the model.
   the row cells draw (layout/README.md), so the device tables' LOW rows repeat the STD ones. The
   `_lvt` and `_hvt` devices are there by model name; `pfet_01v8_lvt`'s minimum length is 0.35 um
   (its smallest bin), not 0.15 um (`default_xtor_size`).
-- The models need ngspice's HSPICE compatibility (`ngbehavior=hsa`): without it, `pfet_01v8_lvt`'s
-  cards fail BSIM4's parameter check ("u0 at current temperature ... is not positive").
+- Spectre reads the Spectre copy of the deck (`libs.tech/spectre/sky130.lib.spice`, written by
+  `spectre/spectre_deck.py`: the same cards, ngspice's braces, AGAUSS draws and inline comments
+  restated); its `_mm` sections vary the mismatch draws in `statistics` blocks (Monte Carlo,
+  `variations=mismatch`), its nominal sections are the deck's with every draw 0.
+- In ngspice the models need HSPICE compatibility (`ngbehavior=hsa`): without it,
+  `pfet_01v8_lvt`'s cards fail BSIM4's parameter check ("u0 at current temperature ... is not
+  positive").
 
 ### Sources
 
 - `sky130A/libs.ref/sky130_fd_pr/spice/sky130_fd_pr__nfet_01v8__tt.pm3.spice` and the other
   `*__tt.pm3.spice` / `*__tt.corner.spice` cards; `libs.tech/ngspice/sky130.lib.spice` (corner
-  sections, `all.spice`'s `.option scale=1.0u`), open_pdks bd4da56c.
+  sections, `all.spice`'s `.option scale=1.0u`), open_pdks bd4da56c; its Spectre copy
+  `libs.tech/spectre/sky130.lib.spice`.

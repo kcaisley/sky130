@@ -11,9 +11,10 @@ process-portable `hdl21.Primitive` elements into them:
   (2 kohm/sq);
 - MIM capacitors `cap_mim_m3_1`, `cap_mim_m3_2`; junction diodes; vertical PNPs.
 
-Every name is the PDK's CDL name, defined for ngspice on the `sky130_fd_pr__` model by this
-package's `ngspice_devices.spice`, sizes in metres (the models' microns under their
-`.option scale=1.0u`). The open PDK simulates in ngspice only: Spectre does not read its decks.
+Every name is the PDK's CDL name, defined on the `sky130_fd_pr__` model by this package's
+`spectre_devices.scs` (Spectre, on the Spectre copy of the open PDK's deck) and
+`ngspice_devices.spice` (ngspice, on the open PDK's own), sizes in metres (the models' microns
+under their `.option scale=1.0u`).
 """
 
 from pathlib import Path
@@ -83,6 +84,7 @@ class Install(PdkInstallation):
         return h.sim.Include(path=self.stdcell_path)
 
     LOCAL_SPICE_FILES: ClassVar[list[Path]] = [
+        Path("libs.tech/spectre/sky130.lib.spice"),  # spectre/spectre_deck.py's copy of the next
         Path("libs.tech/ngspice/sky130.lib.spice"),
         Path("libs.ref/sky130_fd_pr/spice/sky130_fd_pr__nfet_01v8__tt.pm3.spice"),
         Path("libs.ref/sky130_fd_sc_hd/spice/sky130_fd_sc_hd.spice"),
@@ -107,41 +109,51 @@ class Install(PdkInstallation):
         }[corner]
 
     def include_devices(self) -> h.sim.Include:
-        """ngspice definitions of the package's device names (the PDK's CDL names) on the open PDK's
-        ``sky130_fd_pr__`` models, sizes converted from metres; a simulation includes it after
-        ``include``."""
+        """Spectre definitions of the package's device names (the PDK's CDL names) on the Spectre
+        deck's ``sky130_fd_pr__`` models, sizes converted from metres; a simulation includes it
+        after ``include``."""
+        return h.sim.Include(path=_HERE / "spectre_devices.scs")
+
+    def include_ngspice(self, corner: h.pdk.Corner) -> h.sim.Lib:
+        """The open PDK's own model library (ngspice) at ``corner``."""
+        if corner not in _CORNERS:
+            raise ValueError(f"Invalid corner {corner}")
+        return h.sim.Lib(path=self.pdk_path / "libs.tech/ngspice/sky130.lib.spice", section=_CORNERS[corner])
+
+    def include_ngspice_devices(self) -> h.sim.Include:
+        """ngspice definitions of the package's device names on the open PDK's models."""
         return h.sim.Include(path=_HERE / "ngspice_devices.spice")
 
     # what the site's model decks do not model, per simulator: a device, or "cells", and why
     # (pdk/test_spice.py)
     UNMODELED: ClassVar[dict[str, dict[str, str]]] = {}
 
-    def simulation_includes(self, corner: h.pdk.Corner, simulator: str = "ngspice", mismatch: bool = False) -> list:
+    def simulation_includes(self, corner: h.pdk.Corner, simulator: str = "spectre", mismatch: bool = False) -> list:
         """What a simulation of this package's devices and standard cells includes, in order, for
-        ``simulator``: ngspice (HSPICE compatibility) reads the open PDK's model library at
-        ``corner``, then the package's device names, then the standard cells. ``mismatch``: the
-        corner's ``_mm`` section, whose AGAUSS draws vary each device (a Monte Carlo run by run).
-        Spectre does not read the open PDK's ngspice decks."""
+        ``simulator``: the model library at ``corner``, the package's device names, the standard
+        cells. Spectre reads the Spectre copy of the open PDK's deck (``include``: made by
+        ``spectre/spectre_deck.py``), ngspice (HSPICE compatibility) the open PDK's own
+        (``include_ngspice``). ``mismatch``: the corner's ``_mm`` section, its mismatch draws on
+        (Spectre's ``variations=mismatch``; ngspice's AGAUSS, run by run)."""
 
         if simulator == "spectre":
-            # Spectre 23 reads the decks' .lib sections in SPICE mode but stops on their model
-            # cards: every BSIM4 card of the 5 V, 16 V, RF and special devices (sky130_fd_pr__
-            # pfet_g5v0d10v5__model.0 ... "Unexpected value '1' - expected parameter name", some
-            # 10000 errors)
-            raise NotImplementedError("the open PDK's decks are ngspice's; Spectre stops on their model cards")
-        if simulator != "ngspice":
+            models, devices = self.include(corner), self.include_devices()
+        elif simulator == "ngspice":
+            models, devices = self.include_ngspice(corner), self.include_ngspice_devices()
+        else:
             raise ValueError(f"no {simulator} models for SKY130")
-        models = self.include(corner)
         if mismatch:
             models = h.sim.Lib(path=models.path, section=f"{models.section}_mm")
-        return [models, self.include_devices(), self.include_stdcell()]
+        return [models, devices, self.include_stdcell()]
 
     def include(self, corner: h.pdk.Corner) -> h.sim.Lib:
-        """The open PDK's model library (ngspice) at ``corner``: every device, its resistors and
-        capacitors."""
+        """The model library Spectre reads at ``corner``: the Spectre copy of the open PDK's deck
+        (``libs.tech/spectre/sky130.lib.spice``, its sections the PDK's), every device, its
+        resistors and capacitors."""
         if corner not in _CORNERS:
             raise ValueError(f"Invalid corner {corner}")
-        return h.sim.Lib(path=self.pdk_path / "libs.tech/ngspice/sky130.lib.spice", section=_CORNERS[corner])
+        deck = self.pdk_path / "libs.tech/spectre/sky130.lib.spice"
+        return h.sim.Lib(path=deck, section=_CORNERS[corner])
 
 
 class Sky130Walker(h.HierarchyWalker):

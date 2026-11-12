@@ -1,5 +1,6 @@
-"""Site-local SKY130 installation: the open PDK fetched by ciel (README.md), whose ngspice models,
-KLayout decks and standard cells the kit reads, and the kit's copy of the standard cells' SPICE."""
+"""Site-local SKY130 installation: the open PDK fetched by ciel (README.md), whose models (its
+ngspice deck and the Spectre copy of it, libs.tech/spectre), KLayout decks and standard cells the
+kit reads, and the kit's copy of the standard cells' SPICE."""
 
 import os
 from pathlib import Path

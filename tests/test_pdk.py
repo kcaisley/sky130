@@ -70,26 +70,55 @@ def test_every_device_by_its_model_name(model_name: str) -> None:
     assert Dut.m.of.module.name == model_name
 
 
-def test_device_names_are_defined_for_ngspice() -> None:
-    """Every device the package wraps is a subcircuit of its ngspice device names, and the LVS
+@pytest.mark.parametrize("simulator", ("spectre", "ngspice"))
+def test_device_names_are_defined(simulator: str) -> None:
+    """Every device the package wraps is a subcircuit of the simulator's device names, and the LVS
     rules name each MOS by the deck's device."""
     from pdk.sky130.hdl21.primitives.prim_dicts import bjts, caps, diodes, ress
     from pdk.sky130.netlist.lvs import mos
 
-    text = (site.install.include_devices().path).read_text()
+    devices = site.install.simulation_includes(h.pdk.Corner.TYP, simulator)[1]
+    text = devices.path.read_text()
     defined = {line.split()[1] for line in text.splitlines() if line.lower().startswith(".subckt")}
     wrapped = {m.name for group in (xtors, ress, caps, diodes, bjts) for m in group.values()}
     assert wrapped <= defined, sorted(wrapped - defined)
+    if simulator == "spectre":
+        assert "{" not in text and "simulator lang=spice" in text
     for module in xtors.values():
         found = mos(module.name, 1e-6, 0.15e-6)
         assert found is not None and found[0] == f"sky130_fd_pr__{module.name}"
 
 
-def test_mismatch_section() -> None:
-    models = site.install.simulation_includes(h.pdk.Corner.TYP, mismatch=True)[0]
+def test_spectre_and_ngspice_decks() -> None:
+    """Spectre (frida's simulator: ``include``, ``include_devices``) reads the Spectre copy of the
+    open PDK's deck, ngspice the open PDK's own; both by the PDK's corner sections."""
+    spectre = site.install.simulation_includes(h.pdk.Corner.TYP)
+    assert spectre[0] == site.install.include(h.pdk.Corner.TYP)
+    assert spectre[1] == site.install.include_devices()
+    assert spectre[0].path.parts[-2:] == ("spectre", "sky130.lib.spice")
+    assert spectre[1].path.name == "spectre_devices.scs"
+    ngspice = site.install.simulation_includes(h.pdk.Corner.SLOW, "ngspice")
+    assert ngspice[0].path.parts[-2:] == ("ngspice", "sky130.lib.spice") and ngspice[0].section == "ss"
+    assert ngspice[1].path.name == "ngspice_devices.spice"
+    assert spectre[2] == ngspice[2] == site.install.include_stdcell()
+    with pytest.raises(ValueError):
+        site.install.simulation_includes(h.pdk.Corner.TYP, "xyce")
+
+
+def test_spectre_devices_follow_the_ngspice_ones() -> None:
+    """spectre_devices.scs is ngspice_devices.spice's definitions with HSPICE quotes for its braces."""
+    import re
+
+    here = site.install.include_devices().path.parent
+    ngspice = (here / "ngspice_devices.spice").read_text().split("* ---- 1.8 V core MOS", 1)[1]
+    spectre = (here / "spectre_devices.scs").read_text().split("* ---- 1.8 V core MOS", 1)[1]
+    assert re.sub(r"\{([^{}]*)\}", r"'\1'", ngspice) == spectre
+
+
+@pytest.mark.parametrize("simulator", ("spectre", "ngspice"))
+def test_mismatch_section(simulator: str) -> None:
+    models = site.install.simulation_includes(h.pdk.Corner.TYP, simulator, mismatch=True)[0]
     assert models.section == "tt_mm"
-    with pytest.raises(NotImplementedError):
-        site.install.simulation_includes(h.pdk.Corner.TYP, "spectre")
 
 
 @pytest.mark.site_pdk

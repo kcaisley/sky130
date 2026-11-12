@@ -1,7 +1,7 @@
 """Parameter classes and module makers for the SkyWater SKY130 devices FRIDA compiles to.
 
-Every size is in metres, as in every other FRIDA kit: the open PDK's ngspice models take microns
-under ``.option scale=1.0u``, and the kit's device names (``ngspice_devices.spice``) convert, so
+Every size is in metres, as in every other FRIDA kit: the open PDK's models take microns under
+``.option scale=1.0u``, and the kit's device names (``spectre_devices.scs``, ``ngspice_devices.spice``) convert, so
 FRIDA's netlists, ALIGN and LVS read the same numbers. The names are the PDK's CDL names (its
 ``sky130_fd_sc_hd.cdl``: ``nfet_01v8``, ``pfet_01v8_hvt``), each on its ``sky130_fd_pr__`` model.
 """
@@ -68,7 +68,7 @@ class Sky130LogicParams:
 
 
 def xtor_module(modname: str) -> h.ExternalModule:
-    """A MOS (ports d g s b), a subcircuit of ``ngspice_devices.spice``."""
+    """A MOS (ports d g s b), a subcircuit of ``spectre_devices.scs`` (``ngspice_devices.spice``)."""
     return h.ExternalModule(
         domain=PDK_NAME,
         name=modname,
