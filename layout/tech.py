@@ -7,7 +7,7 @@ mcon / met1 / via / met2 ...: M1 is the local interconnect li1, where the standa
 their pins, M2 is met1 and M6 met5. Row positions follow sky130_fd_sc_hd (2.72 um, 0.46 um
 sites, VSS on even rail lines; li1 rails under met1 rails). The library has no taps in its cells:
 the diffusion is drawn only for devices, the implant of the half it borders runs over each rail
-(nsdm at VSS, psdm at VDD), and the wells are tied by its tapvpwrvgnd cell (its N-tap implant raised, EDGE_TIE) at every
+(nsdm at VSS, psdm at VDD), and the wells are tied by its tapvpwrvgnd cell (EDGE_TIE) at every
 row end.
 
 Three choices follow from SKY130's rules (layout/README.md):
@@ -105,15 +105,21 @@ NW_N, NW_P, NW_TOP = 1440, 1440, 2910
 # into the library cells' own npc (975..1345) where it meets them (npc.1)
 VT_BAND = (1075, 1545)
 VT_MARKS = {"n": ("NPC",), "p": ("NPC",)}  # npc across every row cell at the gate track
-# the standard cells' profile the pads beside them draw (rowcell.std_pad): nsdm below, psdm and the
-# well above; 1425 joins the tap cell's own nsdm (from 1395) and keeps 450 to its psdm (to 975;
-# nsdm.1 / psdm.1 380), the well 470 from the inverters' NMOS (difftap.9 340: LOGIC_OD ends at 955)
+# the standard cells' profile the pads beside them draw (rowcell.std_pad): nsdm up to 1015, psdm
+# from 1355, as the library's cells (STD_SPLIT: the gap their gate contacts' npc band lies in), so a
+# pad keeps nsdm.2 / psdm.2 (380) to the library's tap cell beside it (its psdm to 975, nsdm from
+# 1395); the well from 1425, 470 from the inverters' NMOS (difftap.9 340: LOGIC_OD ends at 955)
 STD_NW = 1425
+STD_SPLIT = (1015, 1355)
 IMP_OH, NW_OH = 0, 190  # overhang of the rail implant bands and the VDD well band past a cell, as the library
-# tie cell at every row end, and its width: the library's tapvpwrvgnd_1 with its N-tap's nsdm raised
-# to 1805, 380 above the pads' nsdm beside it (STD_NW; openroad/views.py adds it to the kit's GDS)
-EDGE_TIE = ("frida__tapvpwrvgnd_1", 460)
+# tie cell at every row end, and its width: the library's tapvpwrvgnd_1 (the wells are tied at the
+# row ends only: SKY130's latch-up rules LU.2 / LU.3, a diffusion within 15 um of a tap, which magic
+# checks with its chip-level marker and the KLayout decks do not, hold for rows up to about 30 um)
+EDGE_TIE = ("sky130_fd_sc_hd__tapvpwrvgnd_1", 460)
 EDGE_W = 920  # row end cell: the tie cell and one site of padding towards the row
+# the row end's supply stacks on the tie cell's own rail mcons (another cut beside them would be
+# nearer than ct.2, a pad beside its met1 rail nearer than m1.2)
+EDGE_STACKS = (230, 230)
 
 # ---- the standard cells next to the rows (stdcell_access.py, netcells.py)
 STD_CELLS = (
@@ -121,7 +127,7 @@ STD_CELLS = (
     "sky130_fd_sc_hd__inv_4",
     "sky130_fd_sc_hd__inv_6",
     "sky130_fd_sc_hd__fill_1",
-    "frida__tapvpwrvgnd_1",
+    "sky130_fd_sc_hd__tapvpwrvgnd_1",
 )
 STD_SUPPLY = ("VPWR", "VGND")  # supply pin names, VDD rail on top (the body pins VPB, VNB on them: openroad/sp)
 STD_FILL, STD_FILL_W = "sky130_fd_sc_hd__fill_1", 460  # one-site filler

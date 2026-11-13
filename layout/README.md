@@ -46,10 +46,12 @@ half width `RAIL` = 85, widest finger `W_MAX` = 690; MOS models nfet_01v8 / pfet
   N-well (MR_lvtn.OVL.2). So the kit compiles every threshold request to them (hdl21/pdk_logic.py),
   and a netlist's MOS are what the layout draws; the `_lvt` and `_hvt` devices only by name.
 - The library has no taps in its cells: `RAIL_OD` and `RAIL_TAPS` are off, nsdm covers the VSS
-  rail and psdm the VDD rail, and the row ends get the tie cell `frida__tapvpwrvgnd_1`
-  (`EDGE_TIE`): the library's tapvpwrvgnd_1 with its N-tap and the nsdm around it 410 nm higher
-  (openroad/views.py), so the pad beside it, with the standard cells' profile split at `STD_NW`
-  (1425), keeps nsdm.1 / psdm.1 to it.
+  rail and psdm the VDD rail, and the row ends get the library's tie cell tapvpwrvgnd_1
+  (`EDGE_TIE`): the pads beside library cells split their implants as the library's (`STD_SPLIT`:
+  nsdm to 1015, psdm from 1355), so a pad keeps nsdm.2 / psdm.2 to the tie cell's inverted
+  implants (psdm to 975, nsdm from 1395). The wells are tied at the row ends only: SKY130's
+  latch-up rules (LU.2 / LU.3, a diffusion within 15 um of a tap; magic checks them with its
+  chip-level marker, the KLayout decks do not) hold for rows up to about 30 um.
 - The boundary layer `BND` is areaid.standardc (81/4), the outline every library cell has (the
   fill and tap cells have no 236/0).
 - The standard cells' pins sit on the library's met1 grid (170 + 340 k), between the rows' M2 tracks
