@@ -146,8 +146,8 @@
       },
       "Direction": "H",
       "Color": [],
-      "Pitch": 680,
-      "Width": 340,
+      "Pitch": 340,
+      "Width": 140,
       "MinL": 780,
       "MaxL": null,
       "EndToEnd": 280,
@@ -194,7 +194,7 @@
       "VencA_L": 85,
       "VencA_H": 85,
       "VencP_L": 0,
-      "VencP_H": 0,
+      "VencP_H": 30,
       "R": {
         "L_3Sigma": 16,
         "Mean": 20,
@@ -256,7 +256,7 @@
       "WidthY": 150,
       "VencA_L": 95,
       "VencA_H": 95,
-      "VencP_L": 0,
+      "VencP_L": 55,
       "VencP_H": 0,
       "R": {
         "L_3Sigma": 16,
@@ -658,9 +658,9 @@
     },
     {
       "Layer": "Rvt",
-      "GdsLayerNo": 255,
+      "GdsLayerNo": 95,
       "GdsDatatype": {
-        "Draw": 2
+        "Draw": 20
       }
     },
     {
@@ -672,9 +672,9 @@
     },
     {
       "Layer": "Hvt",
-      "GdsLayerNo": 95,
+      "GdsLayerNo": 255,
       "GdsDatatype": {
-        "Draw": 20
+        "Draw": 3
       }
     },
     {
@@ -740,10 +740,10 @@
     {
       "Layer": "Cap",
       "m1Pitch": 460,
-      "m2Pitch": 680,
+      "m2Pitch": 340,
       "m3Pitch": 460,
       "m1Width": 170,
-      "m2Width": 340,
+      "m2Width": 140,
       "m3Width": 260
     },
     {

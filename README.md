@@ -102,13 +102,18 @@ ring (at 4 and 6 um it diverges).
 
 ## Limits
 
-- The M2 (met1) tracks are 680 nm apart, twice the library's met1 pitch (a met1 bar carrying a
-  cut is 260 nm wide, m1.4 / via.4a), and every gate is contacted on the middle track inside the
-  npc band: each device type has one S/D track. A device whose source is on its rail lays out;
-  one with a source net of its own does not ("more S/D nets than tracks": samp's switches,
-  comp's input pair), so FRIDA's blocks stop at their netlist step in this kit today.
-- Of sky130_fd_sc_hd, only cells whose pins reach those tracks or the half-pitch between them have
-  access: of the inverters clkinv_1, inv_4, inv_6 (the logic map), also dfxtp_1, mux2_1, conb_1,
-  or2_1; no NAND2 or NOR2, and not inv_1 (`cells.py`'s generic inverter).
+- The M2 (met1) tracks are the library's met1 pitch, 340 nm, with a landing pad round every cut
+  (layout/README.md). A pass device's source and drain bars then sit on neighbouring tracks, and a
+  VIA2 landing on either comes nearer the other's pads than met1's space at most M3 columns: the
+  row engine gives such a net M3 access stubs where the landing is legal (`ACCESS_STUBS`), a cell
+  one site wider where none is (samp's nmos switch). Without them astar's own VIA2 there misses m1.2
+  and ALIGN's hanan routers, which read met1's space as pitch less width (200 nm, not 140), find no
+  VIA2 on such a bar at all.
+- Of sky130_fd_sc_hd the cells whose pins reach the tracks or the half pitch between them have
+  access: inv_1 .. inv_8, clkinv_1/2, nand2_2/4, nor2_2/4 (the logic map: clkinv_1, inv_4, inv_8,
+  nor2_2, nand2_2); nand2_1 and nor2_1 do not.
+- gdscheck's li.5 (licon enclosed by li1 on two adjacent sides) flags two contacts of the
+  library's own nor2_2 that the PDK's KLayout deck passes (its li.5 reads the enclosure by
+  projection, two opposite edges): a difference between the two decks, not a layout error.
 - ngspice loads all 437 cells with the devices in 31 minutes (pdk/test_spice.py allows 20);
   Spectre in 10 s.
