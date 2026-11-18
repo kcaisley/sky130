@@ -66,8 +66,9 @@ pfet_01v8.
   chip-level marker, the KLayout decks not) hold for rows up to about 30 um.
 - The library cells' met1 rails, their met1 pin shapes (68/16, `STD_DROP_LAYERS`: KLayout's met1
   is every datatype of 68 but 5 and 44) and the mcons under them are left out where the cells are
-  placed (`STD_CLIP`): the cells' supplies are their li1 rails, as the row cells', joined by the block's
-  supply straps (align/post.py), and the tracks beside the rail lines stay free for bars.
+  placed (`STD_CLIP`): the cells' supplies are their li1 rails, as the row cells', each rail line a
+  pin of its own that the top level joins by name (frida's flow/layout/post.py), and the tracks
+  beside the rail lines stay free for bars.
 - The boundary layer `BND` is areaid.standardc (81/4), the outline every library cell has (the
   fill and tap cells have no 236/0).
 - The standard cells' pins sit on the library's met1 grid (170 + 340 k), half a pitch off the

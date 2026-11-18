@@ -147,8 +147,8 @@ STD_TRACKS = (1360, 1190, 1530, 1020, 1700, 850, 1870, 680, 2040, 510, 2210, 340
 PIN_PITCH = 170
 # the library cells' met1 rails (480 nm, 30 nm from the tracks beside the rail lines) and their mcons
 # are left out where the cells are placed: their supplies are the li1 rails, as the row cells',
-# joined by the block's supply straps (align/post.py), which the met1 rails would take the rail
-# lines from
+# each rail line a pin of its own (frida's flow/layout/post.py rail_pins), joined by name at the top
+# level
 STD_CLIP = {"M2": (240, H - 240), "V1": (85, H - 85)}
 STD_WIDE = None  # one mcon on any plate
 # the library cells' met1 pin shapes (68/16, their VPWR / VGND rails: their signal pins are li1) left
