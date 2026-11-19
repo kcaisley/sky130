@@ -243,3 +243,9 @@ RES = {
     "cdl": "R{name} {plus} {minus} sky130_fd_pr__res_generic_po w={w}u l={l}u",
     "sim_model": "res_generic_po",
 }
+
+# capdac's drivers (flow.capdac.subckt._drive_r_ohm): the kit's settling time constants over the
+# model's (its tables' on- and switching resistances, its FO4 delay), from capdac frida1 at the
+# typical corner (2026-11-19, run 20261119_003037): at 1 it settled in 450 ps pre-layout and 606 ps
+# post-layout (KLayout-PEX 2.5-D; its MSB 542 ps), so the post-layout over the 500 ps target
+DRIVER_TAU_SCALE = 1.21
