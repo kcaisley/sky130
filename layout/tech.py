@@ -139,6 +139,9 @@ STD_CELLS = (
 STD_SUPPLY = ("VPWR", "VGND")  # supply pin names, VDD rail on top (the body pins VPB, VNB on them: openroad/sp)
 STD_FILL, STD_FILL_W = "sky130_fd_sc_hd__fill_1", 460  # one-site filler
 STD_FILLS = (("sky130_fd_sc_hd__fill_1", 460), ("sky130_fd_sc_hd__fill_2", 920))
+# the library's decoupling capacitors, widest first: the cells a top level's filler pass
+# places in a row's gaps before its fillers (OpenROAD's LEF cannot tell a decap from a filler)
+STD_DECAPS = ('sky130_fd_sc_hd__decap_12', 'sky130_fd_sc_hd__decap_8', 'sky130_fd_sc_hd__decap_6', 'sky130_fd_sc_hd__decap_4', 'sky130_fd_sc_hd__decap_3')
 STD_TEXT_LAYERS: set[int] = set()  # labels sit on the layers' label datatype: netcells drops all text
 # pin access tracks, preferred first (middle of the cell): the M2 tracks and the half-pitch
 # positions between them (PIN_PITCH, the library's own met1 grid 170 + 340 k, where its pins sit),
