@@ -85,6 +85,13 @@ RULES = {
     "V5": {"cut": 800, "space": 800},  # via4.1, via4.2 (met4 190, met5 310: via4.4, m5.3)
     "M6": {"width": 1600, "space": 1600, "pitch": 3400, "area": 4_000_000},  # m5.1, m5.2, m5.4
 }
+
+# the metals a block's pins land on, lowest first (frida's flow.layout.pins: each landing on the
+# lowest of them its route keeps clear of the block's other nets): the metals above the rows'
+# routing (M1 to M3), below the thick top metal, whose pitch takes the converter's double-width
+# routes
+PIN_METALS = (4, 5)
+
 NW_SPACE = 1270  # nwell.2a: N-well space, narrower gaps are closed
 
 # ---- the standard-cell row
