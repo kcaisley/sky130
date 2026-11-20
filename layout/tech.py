@@ -275,3 +275,12 @@ RES = {
 # typical corner (2026-11-19, run 20261119_003037): at 1 it settled in 450 ps pre-layout and 606 ps
 # post-layout (KLayout-PEX 2.5-D; its MSB 542 ps), so the post-layout over the 500 ps target
 DRIVER_TAU_SCALE = 1.21
+
+# a MOM array beside the rows (frida's flow.capdac.subckt._place and
+# flow.layout.primitives.mom): its plates' routes at any height, not kept to the metal over its
+# shield, and its shield's frame no wider at the array's top and bottom. Kept low, ALIGN's hanan
+# router leaves the 32 plate nets in pieces and its astar router finds no path ("Empty path";
+# capdac frida1, 2026-11-20, LVS no match). At any height the plates' routes couple to the top
+# plate within 2.8 LSB on one stage (a difference plate's route on M4, the ring's top metal, 1.1 um
+# above its bar), every other stage within 1.4 LSB
+MOM_PLATES_ROUTED_LOW = False
