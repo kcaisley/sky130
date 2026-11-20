@@ -93,6 +93,22 @@ RULES = {
 PIN_METALS = (4, 5)
 
 NW_SPACE = 1270  # nwell.2a: N-well space, narrower gaps are closed
+NW_SPACE_NET = 1270  # nwell.2a, the decks' one N-well space whatever the nets: a bulk's own well (wellcell)
+WELL_OD = 180  # difftap.8: the well past a PMOS diffusion, a bulk's own well's (wellcell; EDGE is half of difftap.3)
+# the N tap of a well of its own (frida's wellcell; the rails carry no taps): a tap strip with
+# licon on the contacts' pitch (licon.7 0.12 past its ends), nsdm 0.13 past it (as the tap cell's),
+# the well difftap.10 0.18 past it (0.19), its li1 bar as the rails'
+WELL_TAP = {
+    "od": "TAP",
+    "half": 145,
+    "implant": "NP",
+    "implant_half": 275,
+    "implant_end": 130,
+    "marks": [],
+    "well": 190,
+    "m1_half": 85,
+    "pitch": 340,
+}
 
 # ---- the standard-cell row
 H = 2720  # row height; rails at 0 (VSS) and H (VDD)

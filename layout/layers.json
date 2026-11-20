@@ -672,9 +672,9 @@
     },
     {
       "Layer": "Hvt",
-      "GdsLayerNo": 255,
+      "GdsLayerNo": 65,
       "GdsDatatype": {
-        "Draw": 3
+        "Draw": 44
       }
     },
     {
