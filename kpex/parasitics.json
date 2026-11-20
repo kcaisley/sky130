@@ -163,12 +163,12 @@
    },
    {
     "layer_name": "M3",
-    "capacitance": 71.7936,
+    "capacitance": 64.0726,
     "offset": 0.1159
    },
    {
     "layer_name": "M4",
-    "capacitance": 137.8821,
+    "capacitance": 123.0536,
     "offset": 0.1778
    },
    {
@@ -395,5 +395,127 @@
    }
   ]
  },
- "resistance": {}
+ "resistance": {},
+ "line_ends_um": {
+  "M3": 0.1477,
+  "M4": 0.1477
+ },
+ "provenance": {
+  "method": "kpex's forms fitted to 2-D cross-sections (capiche solve2d) in the kit's stack; the MOM metals' sidewall scaled to FasterCap's 3-D coupling per finger length of the capacitive DAC's strips, and their line ends' reach to its ends (flow.layout.kpex_coefficients)",
+  "code_sha": "cddc5a3ac95a",
+  "date": "2026-11-20",
+  "fastercap_tolerance": 0.005,
+  "sidewall_scales": {
+   "M3": 0.89246,
+   "M4": 0.89246
+  },
+  "line_ends_um": {
+   "M3": 0.1477,
+   "M4": 0.1477
+  },
+  "lines_ff_per_um_and_ff": {
+   "2": {
+    "MAIN-TOP": {
+     "fastercap": [
+      0.41158940789473697,
+      0.2713178947368411
+     ],
+     "rcx25_2d": [
+      0.461188904037099,
+      0.16491230331583723
+     ],
+     "rcx25": [
+      0.41158939338622474,
+      0.2768269719756123
+     ]
+    },
+    "DIFF-TOP": {
+     "fastercap": [
+      0.0007456513157894816,
+      0.5385813157894737
+     ],
+     "rcx25_2d": [
+      -0.00011756876774024034,
+      0.47061507368604844
+     ],
+     "rcx25": [
+      -0.00011756876774024776,
+      0.5497940653162472
+     ]
+    }
+   }
+  },
+  "strips_ff": {
+   "strip_2_4000_660_aa": {
+    "MAIN-TOP": {
+     "fastercap": 1.92193,
+     "rcx25": 1.92324
+    },
+    "DIFF-TOP": {
+     "fastercap": 0.54439,
+     "rcx25": 0.54966
+    },
+    "DIFF-MAIN": {
+     "fastercap": 0.09145,
+     "rcx25": 0.08335
+    }
+   },
+   "strip_2_12000_660_aa": {
+    "MAIN-TOP": {
+     "fastercap": 5.2033,
+     "rcx25": 5.21581
+    },
+    "DIFF-TOP": {
+     "fastercap": 0.54282,
+     "rcx25": 0.54782
+    },
+    "DIFF-MAIN": {
+     "fastercap": 0.09952,
+     "rcx25": 0.08026
+    }
+   },
+   "strip_2_24000_660_aa": {
+    "MAIN-TOP": {
+     "fastercap": 10.1523,
+     "rcx25": 10.15501
+    },
+    "DIFF-TOP": {
+     "fastercap": 0.55836,
+     "rcx25": 0.5472
+    },
+    "DIFF-MAIN": {
+     "fastercap": 0.09764,
+     "rcx25": 0.08056
+    }
+   },
+   "strip_2_12000_660_jj": {
+    "MAIN-TOP": {
+     "fastercap": 5.21608,
+     "rcx25": 5.22697
+    },
+    "DIFF-TOP": {
+     "fastercap": 0.5543,
+     "rcx25": 0.55923
+    },
+    "DIFF-MAIN": {
+     "fastercap": 0.09953,
+     "rcx25": 0.08026
+    }
+   },
+   "strip_2_12000_660_ae": {
+    "MAIN-TOP": {
+     "fastercap": 5.16525,
+     "rcx25": 5.18692
+    },
+    "DIFF-TOP": {
+     "fastercap": 0.5053,
+     "rcx25": 0.51891
+    },
+    "DIFF-MAIN": {
+     "fastercap": 0.09759,
+     "rcx25": 0.08026
+    }
+   }
+  }
+ }
 }
